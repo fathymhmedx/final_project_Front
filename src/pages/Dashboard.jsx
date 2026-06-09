@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.png';
 
@@ -70,32 +70,37 @@ export default function Dashboard() {
       <nav className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="Velora" className="w-8 h-8" />
-              <span className="text-white font-bold text-xl tracking-tight">
-                Velora
-              </span>
+            {/* Left side: Logo + Navigation */}
+            <div className="flex items-center gap-8">
+              <Link to="/home" className="flex items-center hover:opacity-80 transition-opacity">
+                <img src={logo} alt="Velora" className="w-8 h-8" />
+              </Link>
+              
+              <Link to="/home" className="hidden sm:block hover:text-white transition-colors text-sm font-medium text-gray-400">
+                Home
+              </Link>
             </div>
 
             {/* User Info + Logout */}
             <div className="flex items-center gap-4">
               <div className="hidden sm:flex items-center gap-3">
                 {/* Avatar */}
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white text-sm font-bold">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white text-sm font-bold overflow-hidden border border-white/10">
+                  {user?.profileImage ? (
+                    <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user?.name} className="w-full h-full object-cover" />
+                  ) : (
+                    user?.name?.charAt(0)?.toUpperCase() || 'U'
+                  )}
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col justify-center">
                   <span className="text-sm font-medium text-white leading-tight">
                     {user?.name || 'User'}
                   </span>
-                  <span
-                    className={`text-xs font-medium leading-tight ${
-                      isAdmin ? 'text-orange-400' : 'text-cyan-400'
-                    }`}
-                  >
-                    {user?.role || 'user'}
-                  </span>
+                  {isAdmin && (
+                    <span className="text-xs font-medium leading-tight text-orange-400">
+                      Admin
+                    </span>
+                  )}
                 </div>
               </div>
               <button

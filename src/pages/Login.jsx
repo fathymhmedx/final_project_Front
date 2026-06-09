@@ -33,7 +33,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/dashboard', { replace: true });
+      navigate('/home', { replace: true });
     } catch (err) {
       const data = err.response?.data;
       if (data?.errors && Array.isArray(data.errors)) {

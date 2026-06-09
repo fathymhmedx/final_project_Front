@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const data = await authService.getCurrentUser();
-        setUser(data.data || data);
+        setUser(data.data?.user || data.user || data.data || data);
       } catch {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('accessToken', data.accessToken);
 
       const userData = await authService.getCurrentUser();
-      setUser(userData.data || userData);
+      setUser(userData.data?.user || userData.user || userData.data || userData);
 
       return { success: true };
     } catch (err) {
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('accessToken', data.data.accessToken);
 
       const userData = await authService.getCurrentUser();
-      setUser(userData.data || userData);
+      setUser(userData.data?.user || userData.user || userData.data || userData);
 
       return { success: true };
     } catch (err) {
@@ -109,6 +109,23 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // ── Update Profile ────────────────────────────────────────────────
+  const updateProfile = useCallback(async (formData) => {
+    setError(null);
+    setLoading(true);
+    try {
+      const data = await authService.updateProfile(formData);
+      setUser(data.data?.user || data.user || data.data || data);
+      return { success: true, message: data.message };
+    } catch (err) {
+      const message = parseError(err);
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const value = {
     user,
     loading,
@@ -116,6 +133,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateProfile,
     isAuthenticated: !!user,
   };
 

@@ -43,3 +43,16 @@ export const getCurrentUser = async () => {
   const { data } = await axiosInstance.get('/users/me');
   return data;
 };
+
+/**
+ * PATCH /users/me  (protected)
+ * Updates the current user profile.
+ */
+export const updateProfile = async (formData) => {
+  const { data } = await axiosInstance.patch('/users/me', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return data;
+};

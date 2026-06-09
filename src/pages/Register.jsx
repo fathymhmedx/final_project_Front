@@ -40,7 +40,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(name, email, password);
-      navigate('/dashboard', { replace: true });
+      navigate('/home', { replace: true });
     } catch (err) {
       const data = err.response?.data;
       if (data?.errors && Array.isArray(data.errors)) {
