@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.png';
 import Button from '../components/Button';
+import Sidebar from '../components/Sidebar';
 
 export default function Profile() {
   const { user, updateProfile, logout } = useAuth();
@@ -80,58 +81,24 @@ export default function Profile() {
   const inputClass = "w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200";
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
-      {/* Navbar (reused simplified version) */}
-      <nav className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-8">
-              <Link to="/home" className="flex-shrink-0">
-                <img src={logo} alt="Velora" className="h-8 w-auto" />
-              </Link>
-              <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-gray-400">
-                <Link to="/home" className="hover:text-white transition-colors">
-                  Home
-                </Link>
-                <Link to="/dashboard" className="hover:text-white transition-colors">
-                  Dashboard
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center gap-5 text-gray-400">
-              <div className="relative group cursor-pointer pl-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border border-white/10">
-                  {user?.profileImage ? (
-                    <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
-                  ) : (
-                    (user?.name?.charAt(0) || 'U').toUpperCase()
-                  )}
-                </div>
-                <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block">
-                  <div className="bg-[#0f1629] border border-white/10 rounded-xl shadow-xl py-2">
-                     <div className="px-4 py-2 border-b border-white/5 mb-1">
-                       <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-                       <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-                     </div>
-                     <Link to="/profile" className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
-                       Profile Settings
-                     </Link>
-                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5 transition-colors">
-                       Sign out
-                     </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="flex min-h-screen bg-[#05080f] text-white font-sans selection:bg-blue-500/30">
+      <Sidebar variant="events" />
 
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        <div className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Profile Settings</h1>
-          <p className="text-gray-400">Update your personal details and public rider identity.</p>
-        </div>
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-6 lg:px-10 pt-24 pb-12 lg:py-12">
+          <div className="mb-8">
+            <button 
+              onClick={() => navigate('/garage')} 
+              className="text-blue-400 hover:text-cyan-400 font-semibold text-sm flex items-center gap-2 mb-6"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Go Back to Garage
+            </button>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Profile Settings</h1>
+            <p className="text-gray-400">Update your personal details and public rider identity.</p>
+          </div>
 
         {message.text && (
           <div className={`mb-8 p-4 rounded-xl border text-sm ${
@@ -272,6 +239,7 @@ export default function Profile() {
             </div>
 
           </form>
+        </div>
         </div>
       </main>
     </div>

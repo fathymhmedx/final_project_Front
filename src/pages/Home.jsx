@@ -1,5 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import axiosInstance from '../api/axios';
 import Button from '../components/Button';
 import logo from '../assets/logo.png';
 import heroImg from '../assets/hero.png';
@@ -8,6 +10,32 @@ import img1 from '../assets/img1.png';
 const Home = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [featuredMachines, setFeaturedMachines] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const scrollRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const { current } = scrollRef;
+      const scrollAmount = direction === 'left' ? -current.offsetWidth : current.offsetWidth;
+      current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    const fetchFeaturedMachines = async () => {
+      try {
+        const { data } = await axiosInstance.get('/products?limit=6&page=1');
+        setFeaturedMachines(data?.data?.products || []);
+      } catch (error) {
+        console.error('Error fetching featured machines:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedMachines();
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -26,8 +54,8 @@ const Home = () => {
                 <img src={logo} alt="Velora" className="h-8 w-auto" />
               </Link>
               <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
-                <Link to="#" className="hover:text-white transition-colors">Marketplace</Link>
-                <Link to="#" className="hover:text-white transition-colors">Ride Events</Link>
+                <Link to="/marketplace" className="hover:text-white transition-colors">Marketplace</Link>
+                <Link to="/ride-events" className="hover:text-white transition-colors">Ride Events</Link>
                 <Link to="#" className="hover:text-white transition-colors">Community</Link>
                 <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
               </div>
@@ -87,9 +115,11 @@ const Home = () => {
             Experience the next evolution of motorcycle performance and community. Join the elite network of Velora riders today.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button variant="primary" className="px-8 py-3.5 text-base rounded-full shadow-[0_0_20px_rgba(59,130,246,0.4)]">
-              Explore Marketplace
-            </Button>
+            <Link to="/marketplace">
+              <Button variant="primary" className="px-8 py-3.5 text-base rounded-full shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                Explore Marketplace
+              </Button>
+            </Link>
             <Button variant="secondary" className="px-8 py-3.5 text-base rounded-full bg-[#0f1629]/80 border border-white/10 hover:bg-[#1a2540]">
               Join Community
             </Button>
@@ -126,60 +156,78 @@ const Home = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-white">Featured Machines</h2>
           </div>
           <div className="hidden sm:flex gap-3">
-            <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
+            <button onClick={() => scroll('left')} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
               <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
+            <button onClick={() => scroll('right')} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
               <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {[
-            { name: 'X-Phantom 1000R', price: '$24,500', speed: '192 MPH', hp: '212 HP', img: img1, tag: 'NEW ARRIVAL' },
-            { name: 'Street-S Elite', price: '$18,900', speed: '155 MPH', hp: '145 HP', img: img1, tag: '' },
-            { name: 'Volt Hyperion', price: '$32,000', speed: '210 MPH', hp: '200 HP', img: img1, tag: 'ELECTRIC' },
-          ].map((bike, i) => (
-            <div key={i} className="bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 group">
-              <div className="relative h-64 overflow-hidden bg-black/40">
-                <img src={bike.img} alt={bike.name} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
-                {bike.tag && (
-                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
-                    {bike.tag}
-                  </div>
-                )}
-              </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-white">{bike.name}</h3>
-                  <span className="text-cyan-400 font-semibold">{bike.price}</span>
-                </div>
-                <div className="flex gap-4 mb-6 text-sm text-gray-400">
-                  <div className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    {bike.speed}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-                    {bike.hp}
-                  </div>
-                </div>
-                <Button variant="secondary" fullWidth className="border border-white/10 hover:border-blue-500/50 bg-transparent text-white">
-                  View Specs
-                </Button>
-              </div>
+        <div 
+          ref={scrollRef}
+          className="flex gap-6 lg:gap-8 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-8 -mb-8"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {loading ? (
+            <div className="w-full text-center py-12">
+              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-400">Loading Elite Selection...</p>
             </div>
-          ))}
+          ) : featuredMachines.length > 0 ? (
+            featuredMachines.map((bike) => (
+              <div key={bike._id} className="flex-shrink-0 w-[85vw] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-21.33px)] snap-start bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 group">
+                <div className="relative h-64 overflow-hidden bg-black/40">
+                  <img src={bike.images?.[0]?.url ? `http://localhost:8000/uploads/products/${bike.images[0].url}` : img1} alt={bike.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
+                  {bike.condition && (
+                    <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
+                      {bike.condition}
+                    </div>
+                  )}
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-white line-clamp-1">{bike.title}</h3>
+                    <span className="text-cyan-400 font-semibold whitespace-nowrap ml-2">${bike.price?.toLocaleString()}</span>
+                  </div>
+                  <div className="flex gap-4 mb-6 text-sm text-gray-400">
+                    <div className="flex items-center gap-1.5 overflow-hidden">
+                      <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      <span className="truncate">{bike.location || 'Unknown'}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 capitalize flex-shrink-0">
+                      <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                      {bike.category}
+                    </div>
+                  </div>
+                  <Link to={`/products/${bike._id}`}>
+                    <Button variant="secondary" fullWidth className="border border-white/10 hover:border-blue-500/50 bg-transparent text-white">
+                      View Details
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="w-full text-center py-12 text-gray-400">
+              No featured machines available at the moment.
+            </div>
+          )}
         </div>
       </section>
 
       {/* Upcoming Ride Events Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-10">
-          <p className="text-xs tracking-widest text-blue-400 font-semibold uppercase mb-2">GLOBAL NETWORK</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-white">Upcoming Ride Events</h2>
-        </div>
+        <div className="flex justify-between items-end mb-8">
+            <div>
+              <p className="text-xs tracking-widest text-blue-400 font-semibold uppercase mb-2">GLOBAL NETWORK</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white">Upcoming Ride Events</h2>
+            </div>
+            <Link to="/ride-events" className="hidden sm:flex text-blue-400 hover:text-cyan-400 font-semibold items-center gap-2 transition-colors">
+              Explore More Events <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            </Link>
+          </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Large Event Card */}
@@ -201,9 +249,9 @@ const Home = () => {
                   <div className="w-8 h-8 rounded-full bg-gray-600 border-2 border-[#0f1629]"></div>
                   <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-[#0f1629] flex items-center justify-center text-xs font-bold">+47</div>
                 </div>
-                <button className="text-blue-400 hover:text-cyan-400 text-sm font-semibold transition-colors">
-                  Details →
-                </button>
+                <Link to="/ride-events" className="px-6 py-3 rounded-lg bg-[#1a2035] hover:bg-[#252d47] text-white font-bold transition-all w-fit text-sm">
+                  Explore Ride Events
+                </Link>
               </div>
             </div>
           </div>
@@ -285,7 +333,7 @@ const Home = () => {
               <h4 className="text-white font-semibold mb-6">Platform</h4>
               <ul className="space-y-4 text-sm text-gray-500">
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Home</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Marketplace</a></li>
+                <li><Link to="/marketplace" className="hover:text-blue-400 transition-colors">Marketplace</Link></li>
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Events</a></li>
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Community</a></li>
               </ul>

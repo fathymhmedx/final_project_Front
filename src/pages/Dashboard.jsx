@@ -76,6 +76,9 @@ export default function Dashboard() {
                 <img src={logo} alt="Velora" className="w-8 h-8" />
               </Link>
               
+              <Link to="/marketplace" className="hidden sm:block hover:text-white transition-colors text-sm font-medium text-gray-400">
+                Marketplace
+              </Link>
               <Link to="/home" className="hidden sm:block hover:text-white transition-colors text-sm font-medium text-gray-400">
                 Home
               </Link>

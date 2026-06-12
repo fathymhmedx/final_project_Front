@@ -4,6 +4,13 @@ import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import Home from '../pages/Home';
 import Profile from '../pages/Profile';
+import Marketplace from '../pages/Marketplace';
+import RideEvents from '../pages/RideEvents';
+import ProductDetails from '../pages/ProductDetails';
+import Garage from '../pages/Garage';
+import SellBike from '../pages/SellBike';
+import EditBike from '../pages/EditBike';
+import UserProfile from '../pages/UserProfile';
 import Forbidden from '../pages/Forbidden';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
@@ -53,6 +60,69 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/products/:id"
+        element={
+          <ProtectedRoute>
+            <ProductDetails />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/marketplace"
+        element={
+          <ProtectedRoute>
+            <Marketplace />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/ride-events"
+        element={
+          <ProtectedRoute>
+            <RideEvents />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/garage"
+        element={
+          <ProtectedRoute>
+            <Garage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/sell-bike"
+        element={
+          <ProtectedRoute>
+            <SellBike />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/edit-bike/:id"
+        element={
+          <ProtectedRoute>
+            <EditBike />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/users/:id"
+        element={
+          <ProtectedRoute>
+            <UserProfile />
           </ProtectedRoute>
         }
       />
