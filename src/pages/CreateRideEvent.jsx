@@ -115,7 +115,12 @@ export default function CreateRideEvent() {
       navigate(`/ride-events/${eventId}`);
     } catch (err) {
       console.error('Error creating event:', err);
-      setError(err.response?.data?.message || 'Failed to create event. Please try again.');
+      const responseData = err.response?.data;
+      if (responseData?.errors && responseData.errors.length > 0) {
+        setError(responseData.errors.map(e => e.message).join(' | '));
+      } else {
+        setError(responseData?.message || 'Failed to create event. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
