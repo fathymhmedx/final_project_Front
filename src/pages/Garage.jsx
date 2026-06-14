@@ -14,6 +14,7 @@ export default function Garage() {
   const [myProducts, setMyProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   useEffect(() => {
     const fetchGarageData = async () => {
@@ -35,18 +36,17 @@ export default function Garage() {
     fetchGarageData();
   }, []);
 
-  const handleDeleteProduct = async (productId) => {
-    if (!window.confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
-      return;
-    }
-
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
     try {
-      await axiosInstance.delete(`/products/${productId}`);
+      await axiosInstance.delete(`/products/${productToDelete}`);
       // Remove from UI
-      setMyProducts((prev) => prev.filter((p) => p._id !== productId));
+      setMyProducts((prev) => prev.filter((p) => p._id !== productToDelete));
+      setProductToDelete(null);
     } catch (err) {
       console.error('Error deleting product:', err);
       alert('Failed to delete the product.');
+      setProductToDelete(null);
     }
   };
 
@@ -209,7 +209,7 @@ export default function Garage() {
                             <Link to={`/edit-bike/${product._id}`} className="flex-1 text-center py-1.5 bg-white/5 hover:bg-blue-500/20 text-xs font-semibold text-gray-300 hover:text-blue-400 rounded-lg transition-colors border border-transparent hover:border-blue-500/30">
                               Edit
                             </Link>
-                            <button onClick={() => handleDeleteProduct(product._id)} className="flex-1 text-center py-1.5 bg-white/5 hover:bg-red-500/20 text-xs font-semibold text-gray-300 hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/30">
+                            <button onClick={() => setProductToDelete(product._id)} className="flex-1 text-center py-1.5 bg-white/5 hover:bg-red-500/20 text-xs font-semibold text-gray-300 hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/30">
                               Delete
                             </button>
                           </div>
@@ -267,6 +267,32 @@ export default function Garage() {
           </div>
         </div>
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="bg-[#0f1629] border border-white/10 rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden animate-fade-in">
+            <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+            <h3 className="text-2xl font-bold text-white mb-2">Delete Machine?</h3>
+            <p className="text-gray-400 mb-8">Are you sure you want to remove this machine from your garage? This action cannot be undone.</p>
+            <div className="flex justify-end gap-4">
+              <button 
+                onClick={() => setProductToDelete(null)}
+                className="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-xl transition-all"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

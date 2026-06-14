@@ -11,7 +11,9 @@ const Home = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [featuredMachines, setFeaturedMachines] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingEvents, setLoadingEvents] = useState(true);
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
@@ -34,7 +36,19 @@ const Home = () => {
       }
     };
 
+    const fetchUpcomingEvents = async () => {
+      try {
+        const { data } = await axiosInstance.get('/ride-events/upcoming');
+        setUpcomingEvents(data?.data?.events || []);
+      } catch (error) {
+        console.error('Error fetching upcoming events:', error);
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+
     fetchFeaturedMachines();
+    fetchUpcomingEvents();
   }, []);
 
   const handleLogout = async () => {
@@ -229,60 +243,78 @@ const Home = () => {
             </Link>
           </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Large Event Card */}
-          <div className="lg:col-span-2 bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden flex flex-col sm:flex-row group hover:border-blue-500/30 transition-colors">
-            <div className="sm:w-3/5 relative min-h-[250px] bg-black/50">
-               <img src={img1} alt="Canyon Run" className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-500" />
-               <div className="absolute bottom-4 left-4 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                 OCT 12-14
-               </div>
-            </div>
-            <div className="sm:w-2/5 p-8 flex flex-col justify-center">
-              <h3 className="text-2xl font-bold text-white mb-3">Canyon Run</h3>
-              <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                A three-day endurance ride through the Pacific Northwest's most challenging coastal routes. Limited to 50 Elite Members.
-              </p>
-              <div className="flex items-center justify-between mt-auto">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-gray-700 border-2 border-[#0f1629]"></div>
-                  <div className="w-8 h-8 rounded-full bg-gray-600 border-2 border-[#0f1629]"></div>
-                  <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-[#0f1629] flex items-center justify-center text-xs font-bold">+47</div>
+        {loadingEvents ? (
+          <div className="w-full text-center py-12">
+            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading Events...</p>
+          </div>
+        ) : upcomingEvents.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[400px]">
+            {/* Large Event Card */}
+            {upcomingEvents[0] && (
+              <div className="lg:col-span-2 bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden flex flex-col sm:flex-row group hover:border-blue-500/30 transition-colors h-full">
+                <div className="sm:w-3/5 relative min-h-[250px] bg-black/50">
+                  <img src={upcomingEvents[0].coverImage ? `http://localhost:8000/uploads/ride-events/${upcomingEvents[0].coverImage}` : img1} alt={upcomingEvents[0].title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute bottom-4 left-4 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                    {new Date(upcomingEvents[0].startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}
+                  </div>
                 </div>
-                <Link to="/ride-events" className="px-6 py-3 rounded-lg bg-[#1a2035] hover:bg-[#252d47] text-white font-bold transition-all w-fit text-sm">
-                  Explore Ride Events
-                </Link>
+                <div className="sm:w-2/5 p-8 flex flex-col justify-center">
+                  <h3 className="text-2xl font-bold text-white mb-3">{upcomingEvents[0].title}</h3>
+                  <p className="text-gray-400 text-sm mb-6 leading-relaxed line-clamp-3">
+                    {upcomingEvents[0].description || 'No description available for this event.'}
+                  </p>
+                  <div className="flex items-center justify-between mt-auto">
+                    <div className="flex items-center gap-2 text-sm text-gray-300">
+                      <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                      <span className="font-bold">{upcomingEvents[0].participantsCount}</span> / {upcomingEvents[0].maxParticipants} Riders
+                    </div>
+                    <Link to={`/ride-events/${upcomingEvents[0]._id}`} className="px-6 py-3 rounded-lg bg-[#1a2035] border border-white/5 hover:border-blue-500/30 hover:bg-[#252d47] text-white font-bold transition-all w-fit text-sm">
+                      Details
+                    </Link>
+                  </div>
+                </div>
               </div>
+            )}
+
+            {/* Small Event Cards */}
+            <div className="flex flex-col gap-4 overflow-y-auto pr-2 h-full" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
+              {upcomingEvents.slice(1).map((event) => (
+                <div key={event._id} className="bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all flex-shrink-0 flex flex-col group shadow-lg">
+                  <div className="h-28 w-full relative bg-[#1a2540] overflow-hidden">
+                    <img src={event.coverImage ? `http://localhost:8000/uploads/ride-events/${event.coverImage}` : img1} alt={event.title} className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f1629] via-transparent to-transparent opacity-80"></div>
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wider border border-white/10">
+                      {event.type}
+                    </div>
+                  </div>
+                  <div className="p-5 flex-1 flex flex-col -mt-2 relative z-10">
+                    <h3 className="text-lg font-bold text-white mb-1 line-clamp-1 group-hover:text-cyan-400 transition-colors">{event.title}</h3>
+                    <p className="text-[11px] text-gray-400 font-semibold uppercase mb-4">
+                      {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {new Date(event.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                    </p>
+                    <div className="flex justify-between items-center text-sm mt-auto border-t border-white/5 pt-3">
+                      <div className="flex items-center gap-1.5 text-gray-400 text-xs truncate max-w-[65%]">
+                         <svg className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                         <span className="truncate">{event.meetingPoint}</span>
+                      </div>
+                      <Link to={`/ride-events/${event._id}`} className="text-blue-400 font-semibold hover:text-cyan-400 text-xs whitespace-nowrap">Details →</Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {upcomingEvents.length <= 1 && (
+                <div className="bg-[#0f1629] border border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center flex-1 text-center min-h-[150px]">
+                  <p className="text-sm text-gray-400">No more upcoming events.</p>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Small Event Cards */}
-          <div className="flex flex-col gap-6">
-            <div className="bg-[#0f1629] border border-white/5 rounded-2xl p-6 hover:border-blue-500/30 transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Neon Circuit Night</h3>
-              <p className="text-gray-400 text-sm mb-4">Underground urban circuit ride through the heart of Tokyo. High-speed, high visibility.</p>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">NOV 24 • 21:00</span>
-                <button className="text-blue-400 font-semibold hover:text-cyan-400">Details →</button>
-              </div>
-            </div>
-
-            <div className="bg-[#0f1629] border border-white/5 rounded-2xl p-6 hover:border-blue-500/30 transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center mb-4">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Rider Tech Expo</h3>
-              <p className="text-gray-400 text-sm mb-4">First look at the 2025 AI upgrades and augmented reality helmets.</p>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">DEC 05 • 09:00</span>
-                <button className="text-blue-400 font-semibold hover:text-cyan-400">RSVP →</button>
-              </div>
-            </div>
+        ) : (
+          <div className="w-full text-center py-12 bg-[#0f1629] rounded-2xl border border-white/5">
+            <p className="text-gray-400">No upcoming events right now. Check back later!</p>
           </div>
-        </div>
+        )}
       </section>
 
       {/* The Collective Section */}

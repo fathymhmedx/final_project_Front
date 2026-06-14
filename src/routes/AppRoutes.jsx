@@ -6,6 +6,8 @@ import Home from '../pages/Home';
 import Profile from '../pages/Profile';
 import Marketplace from '../pages/Marketplace';
 import RideEvents from '../pages/RideEvents';
+import RideEventDetails from '../pages/RideEventDetails';
+import CreateRideEvent from '../pages/CreateRideEvent';
 import ProductDetails from '../pages/ProductDetails';
 import Garage from '../pages/Garage';
 import SellBike from '../pages/SellBike';
@@ -87,6 +89,33 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <RideEvents />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/ride-events/create"
+        element={
+          <ProtectedRoute>
+            <CreateRideEvent />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/ride-events/:id/edit"
+        element={
+          <ProtectedRoute>
+            <CreateRideEvent />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/ride-events/:id"
+        element={
+          <ProtectedRoute>
+            <RideEventDetails />
           </ProtectedRoute>
         }
       />
