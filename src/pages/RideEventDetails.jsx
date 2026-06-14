@@ -79,7 +79,7 @@ export default function RideEventDetails() {
         <main className="flex-1 flex flex-col items-center justify-center">
           <svg className="w-16 h-16 text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           <h2 className="text-2xl font-bold mb-2">Event Not Found</h2>
-          <button onClick={() => navigate(-1)} className="text-blue-400 hover:text-cyan-400 font-semibold">
+          <button onClick={() => navigate('/ride-events')} className="text-blue-400 hover:text-cyan-400 font-semibold">
             ← Go Back
           </button>
         </main>
@@ -113,7 +113,7 @@ export default function RideEventDetails() {
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[1000px] mx-auto px-6 lg:px-10 py-10">
           
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
+          <button onClick={() => navigate('/ride-events')} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Back to Events
           </button>
