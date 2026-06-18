@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../api/axios';
 import Button from '../components/Button';
 import logo from '../assets/logo.png';
-import heroImg from '../assets/hero.png';
 import img1 from '../assets/img1.png';
 
 const Home = () => {
@@ -113,28 +112,32 @@ const Home = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-40 lg:pt-48 lg:pb-56 overflow-hidden">
-        {/* Background Image & Overlays */}
+      <section className="relative pt-32 pb-40 lg:pt-44 lg:pb-52 overflow-hidden">
+        {/* Animated Gradient Background */}
         <div className="absolute inset-0 z-0">
-          <img src={heroImg || img1} alt="Hero" className="w-full h-full object-cover opacity-60 mix-blend-lighten" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e1a]/80 via-transparent to-[#0a0e1a]"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0e1a]/50 to-transparent"></div>
+          <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] animate-pulse" />
+          <div className="absolute bottom-[-10%] right-[5%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute top-[20%] right-[25%] w-[400px] h-[400px] bg-indigo-500/8 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '3s' }} />
+          {/* Subtle grid pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-transparent to-[#0a0e1a]" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-xs tracking-[0.3em] text-cyan-400 font-semibold uppercase mb-6">THE PREMIER MOTORCYCLE MARKETPLACE</p>
           <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6">
-            Ride Beyond Limits
+            Ride Beyond <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Limits</span>
           </h1>
-          <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 font-light">
+          <p className="mt-4 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
             Experience the next evolution of motorcycle performance and community. Join the elite network of Velora riders today.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link to="/marketplace">
-              <Button variant="primary" className="px-8 py-3.5 text-base rounded-full shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+              <Button variant="primary" className="px-8 py-3.5 text-base rounded-full shadow-[0_0_25px_rgba(6,182,212,0.3)] bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border-0">
                 Explore Marketplace
               </Button>
             </Link>
-            <Button variant="secondary" className="px-8 py-3.5 text-base rounded-full bg-[#0f1629]/80 border border-white/10 hover:bg-[#1a2540]">
+            <Button variant="secondary" className="px-8 py-3.5 text-base rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all">
               Join Community
             </Button>
           </div>

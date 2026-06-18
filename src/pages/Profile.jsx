@@ -71,17 +71,18 @@ export default function Profile() {
 
     if (result.success) {
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 5000);
     } else {
       setMessage({ type: 'error', text: result.error || 'Failed to update profile.' });
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const inputClass = "w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200";
 
   return (
-    <div className="flex min-h-screen bg-[#05080f] text-white font-sans selection:bg-blue-500/30">
+    <div className="flex min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
       <Sidebar variant="events" />
 
       <main className="flex-1 overflow-y-auto">

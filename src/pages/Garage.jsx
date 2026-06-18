@@ -13,19 +13,22 @@ export default function Garage() {
   const { user } = useAuth();
   const [myProducts, setMyProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productToDelete, setProductToDelete] = useState(null);
 
   useEffect(() => {
     const fetchGarageData = async () => {
       try {
-        const [productsRes, wishlistRes] = await Promise.all([
+        const [productsRes, wishlistRes, eventsRes] = await Promise.all([
           axiosInstance.get('/products/my'),
-          axiosInstance.get('/wishlist')
+          axiosInstance.get('/wishlist'),
+          axiosInstance.get('/ride-events/upcoming')
         ]);
         
         setMyProducts(productsRes.data?.data?.products || []);
         setWishlist(wishlistRes.data?.data?.wishlist || []);
+        setUpcomingEvents(eventsRes.data?.data?.events || []);
       } catch (err) {
         console.error('Error fetching garage data:', err);
       } finally {
@@ -53,19 +56,19 @@ export default function Garage() {
   const getImg = (item) => item?.images?.[0]?.url ? `${API_IMG}/uploads/products/${item.images[0].url}` : img1;
 
   return (
-    <div className="flex min-h-screen bg-[#05080f] text-white font-sans selection:bg-blue-500/30">
+    <div className="flex min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
       <Sidebar variant="events" />
 
       <main className="flex-1 overflow-y-auto">
         {/* ══════════ Top Hero Section ══════════ */}
         <div className="relative w-full h-[180px] md:h-[300px]">
           <img src={heroImg} alt="Cover" className="absolute inset-0 w-full h-full object-cover opacity-70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#05080f] to-transparent opacity-80 md:opacity-100 md:from-[#05080f]/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e1a] to-transparent opacity-80 md:opacity-100 md:from-[#0a0e1a]/80"></div>
         </div>
           
         {/* User Profile Info */}
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 -mt-12 md:-mt-20 relative z-10 pb-6 md:pb-8 border-b border-white/5">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#05080f] bg-[#0f1629] overflow-hidden flex-shrink-0 relative">
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#0a0e1a] bg-[#0f1629] overflow-hidden flex-shrink-0 relative">
             {user?.profileImage ? (
               <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
             ) : (
@@ -132,31 +135,28 @@ export default function Garage() {
               <div className="bg-[#121622] rounded-2xl p-5 border border-white/5">
                 <div className="flex justify-between items-center mb-5">
                   <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">Upcoming Rides</h3>
-                  <button className="text-[11px] font-bold text-blue-400 hover:text-cyan-400">View All</button>
+                  <Link to="/ride-events" className="text-[11px] font-bold text-blue-400 hover:text-cyan-400">View All</Link>
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
-                      <img src={img2} alt="Ride" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white leading-tight">Midnight Alpine Loop</h4>
-                      <p className="text-[10px] text-gray-400 mt-1">Oct 12 • 42 Riders</p>
-                      <p className="text-[10px] text-gray-500">Joined</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3 pt-4 border-t border-white/5">
-                    <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
-                      <img src={img1} alt="Ride" className="w-full h-full object-cover grayscale opacity-80" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white leading-tight">Coastal Canyon Run</h4>
-                      <p className="text-[10px] text-gray-400 mt-1">Oct 28 • 12 Riders</p>
-                      <p className="text-[10px] text-gray-500">Joined</p>
-                    </div>
-                  </div>
+                  {upcomingEvents.length > 0 ? (
+                    upcomingEvents.slice(0, 3).map(event => (
+                      <Link to={`/ride-events/${event._id}`} key={event._id} className="flex gap-3 group cursor-pointer hover:bg-white/5 p-2 -mx-2 rounded-xl transition-colors">
+                        <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
+                          <img src={event.coverImage ? `${API_IMG}/uploads/ride-events/${event.coverImage}` : img1} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-white leading-tight truncate group-hover:text-cyan-400 transition-colors">{event.title}</h4>
+                          <p className="text-[10px] text-gray-400 mt-1">
+                            {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {event.participantsCount || 0} Riders
+                          </p>
+                          <p className="text-[10px] text-gray-500 uppercase">{event.type || 'Ride'}</p>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 text-center py-4">No upcoming events.</p>
+                  )}
                 </div>
               </div>
             </div>
