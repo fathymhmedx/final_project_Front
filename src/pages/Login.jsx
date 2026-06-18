@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.png';
 import img1 from '../assets/img1.png';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
@@ -20,30 +20,16 @@ export default function Login() {
     if (user) navigate('/dashboard', { replace: true });
   }, [user, navigate]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setError('');
-    setValidationErrors([]);
-
-    if (!email || !password) {
-      setError('Please fill in all fields.');
-      return;
-    }
-
     setLoading(true);
-    try {
-      await login(email, password);
+    const result = await login(data.email, data.password);
+    if (result.success) {
       navigate('/home', { replace: true });
-    } catch (err) {
-      const data = err.response?.data;
-      if (data?.errors && Array.isArray(data.errors)) {
-        setValidationErrors(data.errors.map((e) => e.msg || e.message || e));
-      } else {
-        setError(data?.message || data?.error || 'Login failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error || 'Login failed. Please try again.');
     }
+    setLoading(false);
   };
 
   return (
@@ -92,20 +78,13 @@ export default function Login() {
             </p>
 
             {/* Error Alert */}
-            {(error || validationErrors.length > 0) && (
+            {error && (
               <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
-                {error && <p>{error}</p>}
-                {validationErrors.length > 0 && (
-                  <ul className="list-disc list-inside space-y-1">
-                    {validationErrors.map((msg, i) => (
-                      <li key={i}>{msg}</li>
-                    ))}
-                  </ul>
-                )}
+                <p>{error}</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -119,12 +98,18 @@ export default function Login() {
                   </div>
                   <input
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    {...register("email", { 
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email format"
+                      }
+                    })}
                     placeholder="you@example.com"
-                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
+                    className={`w-full pl-12 pr-4 py-3 bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200`}
                   />
                 </div>
+                {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>}
               </div>
 
               {/* Password */}
@@ -140,10 +125,9 @@ export default function Login() {
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    {...register("password", { required: "Password is required" })}
                     placeholder="••••••••"
-                    className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
+                    className={`w-full pl-12 pr-12 py-3 bg-white/5 border ${errors.password ? 'border-red-500' : 'border-white/10'} rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200`}
                   />
                   <button
                     type="button"
@@ -162,6 +146,7 @@ export default function Login() {
                     )}
                   </button>
                 </div>
+                {errors.password && <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>}
               </div>
 
               {/* Remember + Forgot */}

@@ -44,8 +44,9 @@ axiosInstance.interceptors.response.use(
     // endpoint itself, or if we already retried this request once.
     const isUnauthorized = error.response?.status === 401;
     const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh-token');
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/register');
 
-    if (!isUnauthorized || isRefreshEndpoint || originalRequest._retry) {
+    if (!isUnauthorized || isRefreshEndpoint || isAuthEndpoint || originalRequest._retry) {
       return Promise.reject(error);
     }
 
@@ -78,7 +79,7 @@ axiosInstance.interceptors.response.use(
 
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Removed: window.location.href = '/login' — causes hard reload
 
       return Promise.reject(refreshError);
     } finally {

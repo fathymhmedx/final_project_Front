@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'cairo', ui-sans-serif, system-ui, sans-serif;
   --color-navy-950: #0a0e1a;
   --color-navy-900: #0f1629;
   --color-navy-800: #141d35;

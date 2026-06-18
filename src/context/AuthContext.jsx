@@ -52,7 +52,6 @@ export const AuthProvider = ({ children }) => {
   // ── Login ────────────────────────────────────────────────────────
   const login = useCallback(async (email, password) => {
     setError(null);
-    setLoading(true);
     try {
       const data = await authService.login(email, password);
 
@@ -67,15 +66,12 @@ export const AuthProvider = ({ children }) => {
       const message = parseError(err);
       setError(message);
       return { success: false, error: message };
-    } finally {
-      setLoading(false);
     }
   }, []);
 
   // ── Register ─────────────────────────────────────────────────────
   const register = useCallback(async (name, email, password) => {
     setError(null);
-    setLoading(true);
     try {
       const data = await authService.register(name, email, password);
 
@@ -90,8 +86,6 @@ export const AuthProvider = ({ children }) => {
       const message = parseError(err);
       setError(message);
       return { success: false, error: message };
-    } finally {
-      setLoading(false);
     }
   }, []);
 
