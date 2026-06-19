@@ -17,6 +17,7 @@ export default function UserProfile() {
   const [products, setProducts] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
@@ -30,11 +31,12 @@ export default function UserProfile() {
 
     const fetchProfileData = async () => {
       try {
-        const [userRes, productsRes, followersRes, followingRes] = await Promise.all([
+        const [userRes, productsRes, followersRes, followingRes, eventsRes] = await Promise.all([
           axiosInstance.get(`/users/${id}`),
           axiosInstance.get(`/products?seller=${id}`),
           axiosInstance.get(`/users/${id}/followers`),
           axiosInstance.get(`/users/${id}/following`),
+          axiosInstance.get('/ride-events/upcoming'),
         ]);
 
         setProfileUser(userRes.data?.data?.user);
@@ -43,6 +45,7 @@ export default function UserProfile() {
         const followersList = followersRes.data?.data?.followers || [];
         setFollowers(followersList);
         setFollowing(followingRes.data?.data?.following || []);
+        setUpcomingEvents(eventsRes.data?.data?.events || []);
 
         // Check if current user is already following this user
         if (currentUser) {
@@ -212,35 +215,32 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Upcoming Rides (Static placeholder) */}
+              {/* Upcoming Rides */}
               <div className="bg-[#121622] rounded-2xl p-5 border border-white/5">
                 <div className="flex justify-between items-center mb-5">
                   <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">Upcoming Rides</h3>
-                  <button className="text-[11px] font-bold text-blue-400 hover:text-cyan-400">View All</button>
+                  <Link to="/ride-events" className="text-[11px] font-bold text-blue-400 hover:text-cyan-400">View All</Link>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
-                      <img src={img1} alt="Ride" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white leading-tight">Midnight Alpine Loop</h4>
-                      <p className="text-[10px] text-gray-400 mt-1">Oct 12 • 42 Riders</p>
-                      <p className="text-[10px] text-gray-500">Joined</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-white/5">
-                    <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
-                      <img src={img1} alt="Ride" className="w-full h-full object-cover grayscale opacity-80" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white leading-tight">Coastal Canyon Run</h4>
-                      <p className="text-[10px] text-gray-400 mt-1">Oct 28 • 12 Riders</p>
-                      <p className="text-[10px] text-gray-500">Joined</p>
-                    </div>
-                  </div>
+                  {upcomingEvents.length > 0 ? (
+                    upcomingEvents.slice(0, 3).map(event => (
+                      <Link to={`/ride-events/${event._id}`} key={event._id} className="flex gap-3 group cursor-pointer hover:bg-white/5 p-2 -mx-2 rounded-xl transition-colors">
+                        <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
+                          <img src={event.coverImage ? (event.coverImage.startsWith('http') ? event.coverImage : `${API_IMG}/uploads/ride-events/${event.coverImage}`) : img1} onError={(e) => { e.target.src = img1; }} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-white leading-tight truncate group-hover:text-cyan-400 transition-colors">{event.title}</h4>
+                          <p className="text-[10px] text-gray-400 mt-1">
+                            {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {event.participantsCount || 0} Riders
+                          </p>
+                          <p className="text-[10px] text-gray-500 uppercase">{event.type || 'Ride'}</p>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 text-center py-4">No upcoming events.</p>
+                  )}
                 </div>
               </div>
             </div>
