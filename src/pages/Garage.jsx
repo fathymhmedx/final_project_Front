@@ -53,7 +53,23 @@ export default function Garage() {
     }
   };
 
-  const getImg = (item) => item?.images?.[0]?.url ? `${API_IMG}/uploads/products/${item.images[0].url}` : img1;
+  const getImg = (item) => {
+    const url = item?.images?.[0]?.url || item?.imageCover;
+    if (!url) return img1;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/uploads')) return `${API_IMG}${url}`;
+    return `${API_IMG}/uploads/products/${url}`;
+  };
+
+  const getUserImg = (usr) => {
+    if (!usr?.profileImage) return null;
+    let imgPath = usr.profileImage;
+    if (!imgPath.includes('.')) {
+      imgPath += '.jpg';
+    }
+    if (imgPath.startsWith('http')) return imgPath;
+    return `${API_IMG}/uploads/users/${imgPath}`;
+  };
 
   return (
     <div className="flex min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
@@ -70,12 +86,16 @@ export default function Garage() {
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 -mt-12 md:-mt-20 relative z-10 pb-6 md:pb-8 border-b border-white/5">
           <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#0a0e1a] bg-[#0f1629] overflow-hidden flex-shrink-0 relative">
             {user?.profileImage ? (
-              <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl font-bold text-gray-500 bg-gray-800">
-                {(user?.name?.charAt(0) || 'U').toUpperCase()}
-              </div>
-            )}
+              <img 
+                src={getUserImg(user)} 
+                alt={user.name} 
+                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                className="w-full h-full object-cover" 
+              />
+            ) : null}
+            <div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl font-bold text-gray-500 bg-gray-800" style={{ display: user?.profileImage ? 'none' : 'flex' }}>
+              {(user?.name?.charAt(0) || 'U').toUpperCase()}
+            </div>
             {user?.isVerified && (
               <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-blue-100 text-blue-900 text-[8px] md:text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 whitespace-nowrap shadow-md">
                 <svg className="w-2.5 h-2.5 md:w-3 md:h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
@@ -113,20 +133,20 @@ export default function Garage() {
                 <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase mb-5">Rider Stats</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-[#1a2035] rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Distance</p>
-                    <p className="text-xl font-bold text-blue-300">12.4k <span className="text-sm font-normal text-blue-300/60">km</span></p>
+                    <p className="text-xs text-gray-400 mb-1">Location</p>
+                    <p className="text-base md:text-lg font-bold text-white truncate" title={user?.location || 'N/A'}>{user?.location || 'N/A'}</p>
                   </div>
                   <div className="bg-[#1a2035] rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Ride Events</p>
-                    <p className="text-xl font-bold text-blue-300">48</p>
-                  </div>
-                  <div className="bg-[#1a2035] rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Achievements</p>
-                    <p className="text-xl font-bold text-white">15</p>
+                    <p className="text-xs text-gray-400 mb-1">Bike Type</p>
+                    <p className="text-base md:text-lg font-bold text-white truncate" title={user?.bikeType || 'N/A'}>{user?.bikeType || 'N/A'}</p>
                   </div>
                   <div className="bg-[#1a2035] rounded-xl p-4">
                     <p className="text-xs text-gray-400 mb-1">Followers</p>
-                    <p className="text-xl font-bold text-cyan-400">842</p>
+                    <p className="text-xl font-bold text-cyan-400">{user?.followersCount || 0}</p>
+                  </div>
+                  <div className="bg-[#1a2035] rounded-xl p-4">
+                    <p className="text-xs text-gray-400 mb-1">Following</p>
+                    <p className="text-xl font-bold text-cyan-400">{user?.followingCount || 0}</p>
                   </div>
                 </div>
               </div>
@@ -143,7 +163,7 @@ export default function Garage() {
                     upcomingEvents.slice(0, 3).map(event => (
                       <Link to={`/ride-events/${event._id}`} key={event._id} className="flex gap-3 group cursor-pointer hover:bg-white/5 p-2 -mx-2 rounded-xl transition-colors">
                         <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
-                          <img src={event.coverImage ? `${API_IMG}/uploads/ride-events/${event.coverImage}` : img1} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                          <img src={event.coverImage ? (event.coverImage.startsWith('http') ? event.coverImage : `${API_IMG}/uploads/ride-events/${event.coverImage}`) : img1} onError={(e) => { e.target.src = img1; }} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-bold text-white leading-tight truncate group-hover:text-cyan-400 transition-colors">{event.title}</h4>
@@ -187,7 +207,7 @@ export default function Garage() {
                     {myProducts.map((product) => (
                       <div key={product._id} className="bg-[#1a2035] rounded-2xl overflow-hidden border border-white/5 flex flex-col group">
                         <div className="relative h-48 bg-black/50 overflow-hidden">
-                          <img src={getImg(product)} alt={product.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
+                          <img src={getImg(product)} onError={(e) => { e.target.src = img1; }} alt={product.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
                         </div>
                         <div className="p-5 flex-1 flex flex-col">
                           <div className="flex justify-between items-start mb-2">
@@ -247,7 +267,7 @@ export default function Garage() {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {wishlist.slice(0, 5).map((item) => (
                       <Link key={item._id} to={`/products/${item._id}`} className="relative h-40 rounded-xl overflow-hidden group">
-                        <img src={getImg(item)} alt={item.title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
+                        <img src={getImg(item)} onError={(e) => { e.target.src = img1; }} alt={item.title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
                           <p className="text-xs font-bold text-white truncate">{item.title}</p>
                         </div>

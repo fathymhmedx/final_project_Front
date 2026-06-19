@@ -24,7 +24,7 @@ export default function RideEvents() {
   const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
-      let url = `/ride-events?page=${page}&limit=6`;
+      let url = `/ride-events?page=${page}&limit=3`;
       
       if (typeFilter === 'my-events') {
         url = '/ride-events/my-events';
@@ -190,9 +190,9 @@ export default function RideEvents() {
             {upcomingEvents[0] && (
               <Link to={`/ride-events/${upcomingEvents[0]._id}`} className="lg:col-span-2 bg-[#0f1629] border border-white/5 rounded-3xl p-6 flex flex-col justify-between group hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-full -z-0"></div>
-                <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
+                <div className="absolute inset-0 opacity-50 group-hover:opacity-70 transition-opacity">
                   <img src={getImg(upcomingEvents[0])} alt={upcomingEvents[0].title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0f1629] via-[#0f1629]/90 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0f1629] via-[#0f1629]/70 to-transparent"></div>
                 </div>
                 
                 <div className="relative z-10">
@@ -330,37 +330,39 @@ export default function RideEvents() {
               </div>
 
               {/* ── Pagination ── */}
-              {(pagination?.numberOfPages > 1 || events.length >= 6) && (
-                <div className="flex justify-center gap-2 mb-8">
+              {(pagination?.numberOfPages >= 1) && (
+                <div className="flex flex-wrap justify-center gap-2 mb-8">
+                  {/* Previous Button */}
                   <button
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => p - 1)}
-                    className="w-9 h-9 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    disabled={!pagination.prev}
+                    onClick={() => setPage(pagination.prev)}
+                    className="w-10 h-10 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                   </button>
 
-                  {pagination?.numberOfPages &&
-                    Array.from({ length: pagination.numberOfPages }, (_, i) => i + 1).map((num) => (
-                      <button
-                        key={num}
-                        onClick={() => setPage(num)}
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all duration-200 ${
-                          page === num
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-lg shadow-blue-500/25'
-                            : 'bg-[#0f1629] border border-white/10 text-gray-400 hover:text-white hover:border-blue-500/40'
-                        }`}
-                      >
-                        {num}
-                      </button>
-                    ))}
+                  {/* Page Numbers */}
+                  {Array.from({ length: pagination.numberOfPages }, (_, i) => i + 1).map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setPage(num)}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-200 ${
+                        page === num
+                          ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-lg shadow-blue-500/25 border-none'
+                          : 'bg-[#0f1629] border border-white/10 text-gray-400 hover:text-white hover:border-blue-500/40 hover:bg-white/5'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
 
+                  {/* Next Button */}
                   <button
-                    disabled={!pagination?.next}
-                    onClick={() => setPage((p) => p + 1)}
-                    className="w-9 h-9 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    disabled={!pagination.next}
+                    onClick={() => setPage(pagination.next)}
+                    className="w-10 h-10 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                   </button>
                 </div>
               )}

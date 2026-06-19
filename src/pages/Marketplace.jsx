@@ -29,9 +29,6 @@ export default function Marketplace() {
   const [pagination, setPagination] = useState({});
   const [page, setPage] = useState(1);
 
-  /* ── related (accessories / parts) ── */
-  const [relatedEquipment, setRelatedEquipment] = useState([]);
-
   /* ── wishlist ── */
   const [wishlistIds, setWishlistIds] = useState([]);
 
@@ -48,7 +45,7 @@ export default function Marketplace() {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      let url = `/products?page=${page}&limit=5`;
+      let url = `/products?page=${page}&limit=6`;
       if (keyword) url += `&keyword=${keyword}`;
       if (filters.categories.length) url += `&category=${filters.categories.join(',')}`;
       if (filters.condition) url += `&condition=${filters.condition}`;
@@ -64,16 +61,6 @@ export default function Marketplace() {
       setLoading(false);
     }
   }, [page, keyword, filters]);
-
-  /* ──────── Fetch Related Equipment ──────── */
-  const fetchRelated = useCallback(async () => {
-    try {
-      const { data } = await axiosInstance.get('/products?category=parts,accessories&limit=6');
-      setRelatedEquipment(data?.data?.products || []);
-    } catch (err) {
-      console.error('Error fetching related:', err);
-    }
-  }, []);
 
   /* ──────── Fetch Wishlist ──────── */
   const fetchWishlist = useCallback(async () => {
@@ -91,9 +78,8 @@ export default function Marketplace() {
   }, [fetchProducts]);
 
   useEffect(() => {
-    fetchRelated();
     fetchWishlist();
-  }, [fetchRelated, fetchWishlist]);
+  }, [fetchWishlist]);
 
   /* ──────── Wishlist Toggle ──────── */
   const toggleWishlist = async (productId) => {
@@ -122,12 +108,14 @@ export default function Marketplace() {
     setPage(1);
   };
 
-  /* ── split products: first is featured, rest go in grid ── */
-  const featured = products[0] || null;
-  const gridProducts = products.slice(1);
-
   /* ── helpers ── */
-  const getImg = (item) => item?.images?.[0]?.url ? `${API_IMG}/uploads/products/${item.images[0].url}` : img1;
+  const getImg = (item) => {
+    const url = item?.images?.[0]?.url || item?.imageCover;
+    if (!url) return img1;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/uploads')) return `${API_IMG}${url}`;
+    return `${API_IMG}/uploads/products/${url}`;
+  };
 
   return (
     <div className="flex min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
@@ -163,173 +151,109 @@ export default function Marketplace() {
             </div>
           ) : (
             <>
-              {/* ══════════ Featured + Grid Layout ══════════ */}
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 mb-12">
-                {/* ── Featured Card (large) ── */}
-                {featured && (
-                  <div className="lg:col-span-3 bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden group hover:border-blue-500/20 transition-all duration-500 relative flex flex-col">
+              {/* ══════════ Products Grid Layout ══════════ */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                {products.map((product) => (
+                  <div
+                    key={product._id}
+                    className="bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden group hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col"
+                  >
                     {/* Image */}
-                    <div className="relative h-[340px] overflow-hidden bg-black/40">
+                    <div className="relative h-[240px] overflow-hidden bg-[#05080f]">
                       <img
-                        src={getImg(featured)}
-                        alt={featured.title}
+                        src={getImg(product)}
+                        alt={product.title}
+                        onError={(e) => { e.target.src = img1; }}
                         className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
                       />
                       {/* Gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f1629] via-transparent to-transparent"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f1629] via-[#0f1629]/20 to-transparent opacity-90"></div>
 
                       {/* Condition badge */}
-                      {featured.condition && (
-                        <div className="absolute top-4 left-4 bg-blue-600/90 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wider">
-                          {featured.condition}
+                      {product.condition && (
+                        <div className="absolute top-4 left-4 bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
+                          {product.condition}
                         </div>
                       )}
 
                       {/* Wishlist */}
                       <button
-                        onClick={() => toggleWishlist(featured._id)}
-                        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-black/60 transition-all"
+                        onClick={() => toggleWishlist(product._id)}
+                        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black/60 transition-all group/btn"
                       >
-                        <HeartIcon filled={wishlistIds.includes(featured._id)} />
+                        <HeartIcon filled={wishlistIds.includes(product._id)} />
                       </button>
+                    </div>
 
-                      {/* Bottom info overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{featured.title}</h2>
-                        <p className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-3">
-                          ${featured.price?.toLocaleString()}
+                    {/* Info */}
+                    <div className="p-5 flex flex-col flex-1">
+                      <div className="flex justify-between items-start mb-2 gap-2">
+                        <h3 className="text-lg font-bold text-white line-clamp-1 group-hover:text-cyan-400 transition-colors">{product.title}</h3>
+                        <p className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 whitespace-nowrap">
+                          ${product.price?.toLocaleString()}
                         </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-300 mb-6">
-                          {featured.location && (
-                            <span className="flex items-center gap-1">
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                              {featured.location}
-                            </span>
-                          )}
-                          <span className="capitalize">{featured.category}</span>
-                          <span className="flex items-center gap-1">
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            {featured.viewsCount || 0}
+                      </div>
+                      
+                      <div className="flex items-center gap-3 text-xs text-gray-400 mb-6 font-medium">
+                        {product.location && (
+                          <span className="flex items-center gap-1.5">
+                            <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                            <span className="truncate max-w-[100px]">{product.location}</span>
                           </span>
-                        </div>
-                        <Link to={`/products/${featured._id}`} className="inline-flex items-center gap-1 text-sm font-semibold text-blue-400 hover:text-cyan-400 transition-colors">
-                          View Details <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+                        )}
+                        <div className="w-1 h-1 rounded-full bg-gray-600"></div>
+                        <span className="capitalize">{product.category}</span>
+                      </div>
+
+                      <div className="mt-auto">
+                        <Link to={`/products/${product._id}`} className="flex items-center justify-between w-full p-3 rounded-xl bg-white/[0.02] hover:bg-blue-500/10 border border-white/5 hover:border-blue-500/30 text-sm font-semibold text-gray-300 hover:text-white transition-all group/link">
+                          <span>View Machine</span>
+                          <svg className="w-5 h-5 text-blue-500 group-hover/link:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </Link>
                       </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* ── Small Cards Grid (2×2) ── */}
-                <div className="lg:col-span-2 grid grid-cols-2 gap-4">
-                  {gridProducts.slice(0, 4).map((product) => (
-                    <div
-                      key={product._id}
-                      className="bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden group hover:border-blue-500/20 transition-all duration-300 flex flex-col"
-                    >
-                      {/* Image */}
-                      <div className="relative h-[120px] overflow-hidden bg-black/30">
-                        <img
-                          src={getImg(product)}
-                          alt={product.title}
-                          className="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500"
-                        />
-                        {/* Wishlist */}
-                        <button
-                          onClick={() => toggleWishlist(product._id)}
-                          className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
-                        >
-                          <HeartIcon filled={wishlistIds.includes(product._id)} />
-                        </button>
-                      </div>
-
-                      {/* Info */}
-                      <div className="p-3.5 flex flex-col flex-1">
-                        <h3 className="text-sm font-bold text-white mb-1 line-clamp-1">{product.title}</h3>
-                        <p className="text-sm font-bold text-cyan-400 mb-2.5">${product.price?.toLocaleString()}</p>
-                        <Link to={`/products/${product._id}`} className="mt-auto text-[11px] font-semibold text-blue-400 hover:text-cyan-400 transition-colors text-left inline-block">
-                          View Details →
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* ── Pagination ── */}
-              {(pagination?.numberOfPages > 1 || products.length >= 5) && (
-                <div className="flex justify-center gap-2 mb-16">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => p - 1)}
-                    className="w-9 h-9 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                  </button>
-
-                  {pagination?.numberOfPages &&
-                    Array.from({ length: pagination.numberOfPages }, (_, i) => i + 1).map((num) => (
-                      <button
-                        key={num}
-                        onClick={() => setPage(num)}
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all duration-200 ${
-                          page === num
-                            ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-lg shadow-blue-500/25'
-                            : 'bg-[#0f1629] border border-white/10 text-gray-400 hover:text-white hover:border-blue-500/40'
-                        }`}
-                      >
-                        {num}
-                      </button>
-                    ))}
-
-                  <button
-                    disabled={!pagination?.next}
-                    onClick={() => setPage((p) => p + 1)}
-                    className="w-9 h-9 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* ══════════ Related Equipment ══════════ */}
-          {relatedEquipment.length > 0 && (
-            <section className="mb-10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Related Equipment</h2>
-                <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 hover:border-white/20 transition-all text-gray-400 hover:text-white">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                  </button>
-                  <button className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 hover:border-white/20 transition-all text-gray-400 hover:text-white">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {relatedEquipment.slice(0, 4).map((item) => (
-                  <div
-                    key={item._id}
-                    className="bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden group hover:border-blue-500/20 transition-all duration-300"
-                  >
-                    <div className="relative h-[140px] overflow-hidden bg-black/30">
-                      <img
-                        src={getImg(item)}
-                        alt={item.title}
-                        className="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-sm font-bold text-white mb-1 line-clamp-1">{item.title}</h3>
-                      <p className="text-sm font-bold text-cyan-400">${item.price?.toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
               </div>
-            </section>
+
+              {/* ── Pagination ── */}
+              {(pagination?.numberOfPages >= 1) && (
+                <div className="flex flex-wrap justify-center gap-2 mb-16">
+                  {/* Previous Button */}
+                  <button
+                    disabled={!pagination.prev}
+                    onClick={() => setPage(pagination.prev)}
+                    className="w-10 h-10 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+
+                  {/* Page Numbers */}
+                  {Array.from({ length: pagination.numberOfPages }, (_, i) => i + 1).map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setPage(num)}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-200 ${
+                        page === num
+                          ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-lg shadow-blue-500/25 border-none'
+                          : 'bg-[#0f1629] border border-white/10 text-gray-400 hover:text-white hover:border-blue-500/40 hover:bg-white/5'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+
+                  {/* Next Button */}
+                  <button
+                    disabled={!pagination.next}
+                    onClick={() => setPage(pagination.next)}
+                    className="w-10 h-10 rounded-xl bg-[#0f1629] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-blue-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
         </div>

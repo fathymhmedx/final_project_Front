@@ -78,6 +78,13 @@ const Home = () => {
     navigate('/login', { replace: true });
   };
 
+  const getProductImgUrl = (url) => {
+    if (!url) return img1;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/uploads')) return `http://localhost:8000${url}`;
+    return `http://localhost:8000/uploads/products/${url}`;
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
       {/* Navbar */}
@@ -219,7 +226,7 @@ const Home = () => {
             featuredMachines.map((bike) => (
               <div key={bike._id} className="flex-shrink-0 w-[85vw] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-21.33px)] snap-start bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 group">
                 <div className="relative h-64 overflow-hidden bg-black/40">
-                  <img src={bike.images?.[0]?.url ? `http://localhost:8000/uploads/products/${bike.images[0].url}` : img1} alt={bike.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
+                  <img src={getProductImgUrl(bike.images?.[0]?.url)} alt={bike.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
                   {bike.condition && (
                     <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
                       {bike.condition}

@@ -63,6 +63,16 @@ export default function ProductDetails() {
     return `${API_IMG}/uploads/products/${url}`;
   };
 
+  const getUserImg = (usr) => {
+    if (!usr?.profileImage) return null;
+    let imgPath = usr.profileImage;
+    if (!imgPath.includes('.')) {
+      imgPath += '.jpg';
+    }
+    if (imgPath.startsWith('http')) return imgPath;
+    return `${API_IMG}/uploads/users/${imgPath}`;
+  };
+
   const images = product.images && product.images.length > 0
     ? product.images.map(img => getImgUrl(img.url))
     : [img1];
@@ -152,10 +162,16 @@ export default function ProductDetails() {
                 <div className="flex items-center gap-4 bg-[#0f1629] border border-white/5 p-4 rounded-2xl">
                   <Link to={`/users/${product.seller?._id}`} className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-lg overflow-hidden border-2 border-white/10 flex-shrink-0 hover:ring-2 hover:ring-blue-500 transition-all">
                     {product.seller?.profileImage ? (
-                      <img src={`http://localhost:8000/uploads/users/${product.seller.profileImage}`} alt={product.seller.name} className="w-full h-full object-cover" />
-                    ) : (
-                      (product.seller?.name?.charAt(0) || 'U').toUpperCase()
-                    )}
+                      <img 
+                        src={getUserImg(product.seller)} 
+                        alt={product.seller.name} 
+                        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : null}
+                    <div className="w-full h-full flex items-center justify-center" style={{ display: product.seller?.profileImage ? 'none' : 'flex' }}>
+                      {(product.seller?.name?.charAt(0) || 'U').toUpperCase()}
+                    </div>
                   </Link>
                   <div className="min-w-0 flex-1">
                     <Link to={`/users/${product.seller?._id}`} className="text-base font-semibold text-white truncate block hover:text-blue-400 transition-colors">{product.seller?.name || 'Unknown Seller'}</Link>

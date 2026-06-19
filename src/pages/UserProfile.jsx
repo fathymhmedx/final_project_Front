@@ -79,11 +79,21 @@ export default function UserProfile() {
   };
 
   const getImg = (item) => {
-    if (!item?.images?.[0]?.url) return img1;
-    const url = item.images[0].url;
+    const url = item?.images?.[0]?.url || item?.imageCover;
+    if (!url) return img1;
     if (url.startsWith('http')) return url;
     if (url.startsWith('/uploads')) return `${API_IMG}${url}`;
     return `${API_IMG}/uploads/products/${url}`;
+  };
+
+  const getUserImg = (usr) => {
+    if (!usr?.profileImage) return null;
+    let imgPath = usr.profileImage;
+    if (!imgPath.includes('.')) {
+      imgPath += '.jpg';
+    }
+    if (imgPath.startsWith('http')) return imgPath;
+    return `${API_IMG}/uploads/users/${imgPath}`;
   };
 
   if (loading) {
@@ -127,12 +137,16 @@ export default function UserProfile() {
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 -mt-12 md:-mt-20 relative z-10 pb-6 md:pb-8 border-b border-white/5">
           <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#05080f] bg-[#0f1629] overflow-hidden flex-shrink-0 relative">
             {profileUser.profileImage ? (
-              <img src={`${API_IMG}/uploads/users/${profileUser.profileImage}`} alt={profileUser.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl font-bold text-gray-500 bg-gray-800">
-                {(profileUser.name?.charAt(0) || 'U').toUpperCase()}
-              </div>
-            )}
+              <img 
+                src={getUserImg(profileUser)} 
+                alt={profileUser.name} 
+                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                className="w-full h-full object-cover" 
+              />
+            ) : null}
+            <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-500 bg-gray-800" style={{ display: profileUser.profileImage ? 'none' : 'flex' }}>
+              {(profileUser.name?.charAt(0) || 'U').toUpperCase()}
+            </div>
             {profileUser.isVerified && (
               <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-blue-100 text-blue-900 text-[8px] md:text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 whitespace-nowrap shadow-md">
                 <svg className="w-2.5 h-2.5 md:w-3 md:h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
