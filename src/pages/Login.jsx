@@ -34,7 +34,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex bg-[#060b18]">
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-[#020617]">
+      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-[#020617]">
         {/* Animated background gradient orbs */}
         <motion.div 
           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -60,7 +60,7 @@ export default function Login() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col h-full p-14">
+        <div className="relative z-10 flex flex-col h-full p-14 lg:p-20 xl:p-24">
           <div className="flex-1 flex flex-col justify-center">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
@@ -71,14 +71,19 @@ export default function Login() {
               Find Your <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Perfect Ride</span>
             </motion.h1>
-            <motion.p 
+            <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-gray-300 text-lg max-w-sm tracking-wide font-light"
+              className="mt-4 border-l-[3px] border-cyan-500/80 pl-5"
             >
-              VELORA | The Premier Motorcycle Marketplace
-            </motion.p>
+              <p className="text-cyan-400 font-bold tracking-[0.25em] text-[10px] uppercase mb-2">
+                Velora
+              </p>
+              <p className="text-gray-400 text-base leading-relaxed max-w-sm font-light">
+                The Premier Motorcycle Marketplace for elite riders and enthusiasts.
+              </p>
+            </motion.div>
           </div>
           
           {/* Logo bottom left */}

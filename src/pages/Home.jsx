@@ -13,7 +13,18 @@ const Home = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [topRiders, setTopRiders] = useState([]);
+  const [loadingRiders, setLoadingRiders] = useState(true);
   const scrollRef = useRef(null);
+  const ridersScrollRef = useRef(null);
+
+  const scrollRiders = (direction) => {
+    if (ridersScrollRef.current) {
+      const { current } = ridersScrollRef;
+      const scrollAmount = direction === 'left' ? -current.offsetWidth / 2 : current.offsetWidth / 2;
+      current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -46,8 +57,20 @@ const Home = () => {
       }
     };
 
+    const fetchTopRiders = async () => {
+      try {
+        const { data } = await axiosInstance.get('/users/top-riders?limit=10');
+        setTopRiders(data?.data?.users || []);
+      } catch (error) {
+        console.error('Error fetching top riders:', error);
+      } finally {
+        setLoadingRiders(false);
+      }
+    };
+
     fetchFeaturedMachines();
     fetchUpcomingEvents();
+    fetchTopRiders();
   }, []);
 
   const handleLogout = async () => {
@@ -131,13 +154,13 @@ const Home = () => {
           <p className="mt-4 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
             Experience the next evolution of motorcycle performance and community. Join the elite network of Velora riders today.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/marketplace">
-              <Button variant="primary" className="px-8 py-3.5 text-base rounded-full shadow-[0_0_25px_rgba(6,182,212,0.3)] bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border-0">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <Link to="/marketplace" className="w-full sm:w-auto">
+              <Button variant="primary" className="w-full px-8 py-3.5 text-base rounded-full shadow-[0_0_25px_rgba(6,182,212,0.3)] bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border-0">
                 Explore Marketplace
               </Button>
             </Link>
-            <Button variant="secondary" className="px-8 py-3.5 text-base rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all">
+            <Button variant="secondary" className="w-full sm:w-auto px-8 py-3.5 text-base rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all">
               Join Community
             </Button>
           </div>
@@ -167,12 +190,12 @@ const Home = () => {
 
       {/* Featured Machines Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="flex justify-between items-end mb-10">
-          <div>
+        <div className="relative flex flex-col items-center mb-10">
+          <div className="text-center">
             <p className="text-xs tracking-widest text-blue-400 font-semibold uppercase mb-2">ELITE SELECTION</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white">Featured Machines</h2>
           </div>
-          <div className="hidden sm:flex gap-3">
+          <div className="hidden md:flex gap-3 absolute right-0 bottom-1">
             <button onClick={() => scroll('left')} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
               <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
@@ -236,15 +259,15 @@ const Home = () => {
 
       {/* Upcoming Ride Events Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-end mb-8">
-            <div>
-              <p className="text-xs tracking-widest text-blue-400 font-semibold uppercase mb-2">GLOBAL NETWORK</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Upcoming Ride Events</h2>
-            </div>
-            <Link to="/ride-events" className="hidden sm:flex text-blue-400 hover:text-cyan-400 font-semibold items-center gap-2 transition-colors">
-              Explore More Events <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </Link>
+        <div className="relative flex flex-col items-center mb-10">
+          <div className="text-center">
+            <p className="text-xs tracking-widest text-blue-400 font-semibold uppercase mb-2">GLOBAL NETWORK</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Upcoming Ride Events</h2>
           </div>
+          <Link to="/ride-events" className="hidden md:flex text-blue-400 hover:text-cyan-400 font-semibold items-center gap-2 transition-colors absolute right-0 bottom-2">
+            Explore More Events <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </Link>
+        </div>
 
         {loadingEvents ? (
           <div className="w-full text-center py-12">
@@ -252,7 +275,40 @@ const Home = () => {
             <p className="text-gray-400">Loading Events...</p>
           </div>
         ) : upcomingEvents.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[400px]">
+          <>
+            {/* Mobile/Tablet Horizontal Scroll Layout */}
+            <div className="flex lg:hidden overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {upcomingEvents.map(event => (
+                <div key={event._id} className="w-[85vw] sm:w-[350px] flex-shrink-0 snap-center bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden flex flex-col group shadow-lg">
+                  <div className="h-48 w-full relative bg-[#1a2540] overflow-hidden">
+                    <img src={event.coverImage ? `http://localhost:8000/uploads/ride-events/${event.coverImage}` : img1} alt={event.title} className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f1629] via-transparent to-transparent opacity-80"></div>
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wider border border-white/10">
+                      {event.type}
+                    </div>
+                  </div>
+                  <div className="p-6 flex-1 flex flex-col relative z-10">
+                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-1 group-hover:text-cyan-400 transition-colors">{event.title}</h3>
+                    <p className="text-sm text-gray-400 mb-4 line-clamp-2">
+                      {event.description || 'No description available for this event.'}
+                    </p>
+                    <p className="text-xs text-blue-400 font-semibold uppercase mb-4">
+                      {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {new Date(event.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                    </p>
+                    <div className="flex justify-between items-center text-sm mt-auto border-t border-white/5 pt-4">
+                      <div className="flex items-center gap-1.5 text-gray-400 text-xs truncate max-w-[65%]">
+                         <svg className="w-4 h-4 text-cyan-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                         <span className="truncate">{event.meetingPoint}</span>
+                      </div>
+                      <Link to={`/ride-events/${event._id}`} className="text-cyan-400 font-bold hover:text-white transition-colors text-sm whitespace-nowrap">Details →</Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Grid Layout */}
+            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[400px]">
             {/* Large Event Card */}
             {upcomingEvents[0] && (
               <div className="lg:col-span-2 bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden flex flex-col sm:flex-row group hover:border-blue-500/30 transition-colors h-full">
@@ -262,7 +318,7 @@ const Home = () => {
                     {new Date(upcomingEvents[0].startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}
                   </div>
                 </div>
-                <div className="sm:w-2/5 p-8 flex flex-col justify-center">
+                <div className="w-full sm:w-2/5 p-6 sm:p-8 flex flex-col justify-center">
                   <h3 className="text-2xl font-bold text-white mb-3">{upcomingEvents[0].title}</h3>
                   <p className="text-gray-400 text-sm mb-6 leading-relaxed line-clamp-3">
                     {upcomingEvents[0].description || 'No description available for this event.'}
@@ -281,10 +337,10 @@ const Home = () => {
             )}
 
             {/* Small Event Cards */}
-            <div className="flex flex-col gap-4 overflow-y-auto pr-2 h-full" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
+            <div className="flex flex-col gap-6 lg:gap-4 lg:overflow-y-auto lg:pr-2 lg:h-full mt-6 lg:mt-0" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
               {upcomingEvents.slice(1).map((event) => (
                 <div key={event._id} className="bg-[#0f1629] border border-white/5 rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all flex-shrink-0 flex flex-col group shadow-lg">
-                  <div className="h-28 w-full relative bg-[#1a2540] overflow-hidden">
+                  <div className="h-48 lg:h-28 w-full relative bg-[#1a2540] overflow-hidden">
                     <img src={event.coverImage ? `http://localhost:8000/uploads/ride-events/${event.coverImage}` : img1} alt={event.title} className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f1629] via-transparent to-transparent opacity-80"></div>
                     <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wider border border-white/10">
@@ -313,6 +369,7 @@ const Home = () => {
               )}
             </div>
           </div>
+          </>
         ) : (
           <div className="w-full text-center py-12 bg-[#0f1629] rounded-2xl border border-white/5">
             <p className="text-gray-400">No upcoming events right now. Check back later!</p>
@@ -320,31 +377,84 @@ const Home = () => {
         )}
       </section>
 
-      {/* The Collective Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-        <p className="text-xs tracking-widest text-gray-400 font-semibold uppercase mb-2">RIDER STORIES</p>
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-12">The Collective</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-left">
-          {[
-            { title: 'Peak Performance', author: 'by Alex "Vortex" Chen', img: img1 },
-            { title: 'Digital Nomad', author: 'by Sarah Miller', img: img1 },
-            { title: 'Track Master', author: 'by Marco Rossi', img: img1 },
-          ].map((story, i) => (
-            <div key={i} className="relative h-80 rounded-2xl overflow-hidden group cursor-pointer">
-              <img src={story.img} alt={story.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-6">
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-cyan-400 transition-colors">{story.title}</h3>
-                <p className="text-sm text-gray-400">{story.author}</p>
-              </div>
-            </div>
-          ))}
+      {/* Elite Riders Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="text-center mb-16">
+          <p className="text-xs tracking-widest text-cyan-400 font-bold uppercase mb-2">COMMUNITY</p>
+          <h2 className="text-3xl md:text-5xl font-bold text-white">Elite Riders</h2>
+          <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Discover and follow the most influential bikers in the Velora community based on their rank and followers.</p>
         </div>
 
-        <Button variant="secondary" className="px-8 border border-white/10 bg-[#0f1629]">
-          View All Stories
-        </Button>
+        {loadingRiders ? (
+          <div className="flex justify-center items-center h-64">
+             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : topRiders.length > 0 ? (
+          <>
+            <div className="flex lg:grid flex-nowrap lg:grid-cols-3 gap-6 lg:gap-8 pt-8 pb-8 lg:pb-0 overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {topRiders.slice(0, 3).map((rider, index) => (
+                <div key={rider._id} className="relative w-[85vw] sm:w-[350px] lg:w-auto flex-shrink-0 snap-center lg:snap-align-none bg-[#0f1629]/80 backdrop-blur-md border border-white/5 rounded-3xl p-8 pt-16 flex flex-col items-center hover:border-cyan-500/30 hover:-translate-y-2 transition-all duration-300 shadow-2xl group mt-10">
+                  
+                  {/* Number Badge (1, 2, 3) */}
+                  <div className="absolute top-4 left-6 text-5xl font-black text-white/5 group-hover:text-cyan-500/10 transition-colors pointer-events-none">
+                    0{index + 1}
+                  </div>
+
+                  {/* Floating Avatar */}
+                  <div className="absolute -top-12 w-24 h-24 rounded-full overflow-hidden border-4 border-[#060b18] shadow-xl group-hover:border-cyan-400 transition-colors bg-gray-800">
+                    {rider.profileImage ? (
+                      <img src={`http://localhost:8000/uploads/users/${rider.profileImage}`} alt={rider.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-3xl font-bold">
+                        {rider.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Verified Badge */}
+                  {rider.isVerified && (
+                    <div className="absolute -top-2 right-[50%] translate-x-10 bg-blue-500 rounded-full p-1 border-2 border-[#060b18] z-10 shadow-lg">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                  )}
+                  
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors truncate w-full text-center relative z-10">{rider.name}</h3>
+                  
+                  <span className={`relative z-10 text-[10px] uppercase tracking-[0.2em] font-bold px-3 py-1 rounded-full mb-6 ${rider.rank === 'Administrator' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : rider.rank === 'Elite Member' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                    {rider.rank}
+                  </span>
+
+                  <p className="text-sm text-gray-400 text-center line-clamp-2 mb-8 min-h-[40px] relative z-10">
+                    {rider.bio || "Passionate motorcycle enthusiast exploring the open roads."}
+                  </p>
+
+                  <div className="grid grid-cols-2 w-full gap-4 mb-2 relative z-10">
+                    <div className="flex flex-col items-center p-3 rounded-2xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+                      <span className="text-white font-bold text-lg">{rider.followersCount}</span>
+                      <span className="text-gray-500 text-[10px] uppercase tracking-wider mt-1">Followers</span>
+                    </div>
+                    <div className="flex flex-col items-center p-3 rounded-2xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+                      <span className="text-white font-bold text-lg line-clamp-1 text-center w-full px-1">{rider.bikeType || 'Any'}</span>
+                      <span className="text-gray-500 text-[10px] uppercase tracking-wider mt-1">Bike</span>
+                    </div>
+                  </div>
+                  
+                  <Link to={`/users/${rider._id}`} className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 w-[80%] py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-bold opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 text-center shadow-[0_0_15px_rgba(0,229,255,0.3)] z-20">
+                    View Full Profile
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-16 text-center">
+              <Link to="/community" className="inline-flex items-center justify-center px-8 py-3 rounded-xl border border-white/10 bg-[#0f1629] text-white text-sm font-semibold hover:bg-white/5 hover:border-cyan-500/30 transition-all shadow-lg hover:shadow-cyan-500/10">
+                Explore Full Community
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className="text-center text-gray-500">No riders found.</div>
+        )}
       </section>
 
       {/* Footer */}
