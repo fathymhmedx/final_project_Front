@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.png';
+import authBg from '../assets/auth_bg.png';
 
 export default function Register() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -47,43 +48,45 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex bg-[#060b18]">
-      {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-[#020617]">
-        {/* Animated background gradient orbs */}
+      {/* Left Panel - Motorcycle Hero Image */}
+      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
+        {/* Background Image */}
+        <img 
+          src={authBg} 
+          alt="" 
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        
+        {/* Dark Overlay + Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/70 to-[#020617]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/80 via-transparent to-transparent" />
+        
+        {/* Animated gradient orbs on top of image */}
         <motion.div 
-          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.35, 0.2] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" 
         />
         <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-500/15 rounded-full blur-[120px]" 
+          className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-cyan-500/15 rounded-full blur-[120px]" 
         />
-        
-        {/* Geometric Hexagon Grid Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="hexagons-reg" width="50" height="43.4" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
-                <path d="M25 0L50 14.5V43.4L25 28.9L0 43.4V14.5L25 0Z" fill="none" stroke="#fff" strokeWidth="0.5"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#hexagons-reg)" />
-          </svg>
-        </div>
+
+        {/* Subtle noise texture */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.5\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat' }} />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full p-14 lg:p-20 xl:p-24">
-          <div className="flex-1 flex flex-col justify-center">
+          <div className="flex-1 flex flex-col justify-end pb-16">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-5xl xl:text-6xl font-bold text-white leading-[1.15] mb-6 tracking-tight"
+              className="text-5xl xl:text-6xl font-bold text-white leading-[1.15] mb-6 tracking-tight drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
             >
-              Find Your <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Perfect Ride</span>
+              Join The <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Riders Community</span>
             </motion.h1>
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -94,7 +97,7 @@ export default function Register() {
                 <p className="text-cyan-400 font-bold tracking-[0.25em] text-[10px] uppercase mb-2">
                   Velora
                 </p>
-                <p className="text-gray-400 text-base leading-relaxed max-w-sm font-light">
+                <p className="text-gray-300 text-base leading-relaxed max-w-sm font-light drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
                   The Premier Motorcycle Marketplace for elite riders and enthusiasts.
                 </p>
               </motion.div>
