@@ -99,8 +99,10 @@ const Home = () => {
               <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
                 <Link to="/marketplace" className="hover:text-white transition-colors">Marketplace</Link>
                 <Link to="/ride-events" className="hover:text-white transition-colors">Ride Events</Link>
-                <Link to="#" className="hover:text-white transition-colors">Community</Link>
-                <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                <Link to="/community" className="hover:text-white transition-colors">Community</Link>
+                {user?.role === 'admin' && (
+                  <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                )}
               </div>
             </div>
 
@@ -167,9 +169,11 @@ const Home = () => {
                 Explore Marketplace
               </Button>
             </Link>
-            <Button variant="secondary" className="w-full sm:w-auto px-8 py-3.5 text-base rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all">
-              Join Community
-            </Button>
+            <Link to="/community" className="w-full sm:w-auto">
+              <Button variant="secondary" className="w-full px-8 py-3.5 text-base rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all">
+                Join Community
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
