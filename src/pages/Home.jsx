@@ -5,6 +5,7 @@ import axiosInstance from '../api/axios';
 import Button from '../components/Button';
 import logo from '../assets/logo.png';
 import img1 from '../assets/img1.png';
+import authBg from '../assets/auth_bg.png';
 
 const Home = () => {
   const { user, logout } = useAuth();
@@ -88,51 +89,65 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-[#0a0e1a]/80 backdrop-blur-md border-b border-white/5">
+      <nav className="sticky top-0 z-50 bg-[#0a0e1a]/60 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo & Links */}
-            <div className="flex items-center gap-8">
-              <Link to="/home" className="flex-shrink-0">
-                <img src={logo} alt="Velora" className="h-8 w-auto" />
+            <div className="flex items-center gap-10">
+              <Link to="/home" className="flex-shrink-0 hover:opacity-80 hover:scale-105 transition-all duration-300">
+                <img src={logo} alt="Velora" className="h-8 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
               </Link>
-              <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
-                <Link to="/marketplace" className="hover:text-white transition-colors">Marketplace</Link>
-                <Link to="/ride-events" className="hover:text-white transition-colors">Ride Events</Link>
-                <Link to="/community" className="hover:text-white transition-colors">Community</Link>
+              <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-300 tracking-wide">
+                <Link to="/marketplace" className="relative group hover:text-white transition-colors py-2">
+                  Marketplace
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+                </Link>
+                <Link to="/ride-events" className="relative group hover:text-white transition-colors py-2">
+                  Ride Events
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+                </Link>
+                <Link to="/community" className="relative group hover:text-white transition-colors py-2">
+                  Community
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+                </Link>
                 {user?.role === 'admin' && (
-                  <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                  <Link to="/dashboard" className="relative group hover:text-white transition-colors py-2">
+                    Dashboard
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+                  </Link>
                 )}
               </div>
             </div>
 
             {/* Right Icons */}
-            <div className="flex items-center gap-5 text-gray-400">
-              <button className="hover:text-white transition-colors">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+            <div className="flex items-center gap-4 text-gray-400">
+              <button className="relative p-2.5 rounded-full hover:bg-white/5 hover:text-white transition-all duration-300 group">
+                <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                {/* Notification Dot */}
+                <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.8)] border-2 border-[#0a0e1a]"></span>
               </button>
-              <button className="hover:text-white transition-colors">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-              </button>
-              <div className="relative group cursor-pointer pl-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border border-white/10">
+              
+              <div className="relative group cursor-pointer pl-1">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border-2 border-transparent group-hover:border-cyan-400 shadow-lg transition-all duration-300">
                   {user?.profileImage ? (
-                    <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
+                    <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   ) : (
                     (user?.name?.charAt(0) || 'U').toUpperCase()
                   )}
                 </div>
-                {/* Simple dropdown for logout */}
-                <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block">
-                  <div className="bg-[#0f1629] border border-white/10 rounded-xl shadow-xl py-2">
-                     <div className="px-4 py-2 border-b border-white/5 mb-1">
-                       <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-                       <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                {/* Enhanced Dropdown */}
+                <div className="absolute right-0 top-[120%] pt-2 w-56 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                  <div className="bg-[#0a0e1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl py-2 overflow-hidden">
+                     <div className="px-5 py-3 border-b border-white/5 mb-1 bg-white/[0.02]">
+                       <p className="text-sm font-bold text-white truncate">{user?.name}</p>
+                       <p className="text-xs text-cyan-400 truncate mt-0.5">{user?.email}</p>
                      </div>
-                     <Link to="/profile" className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                     <Link to="/profile" className="block w-full text-left px-5 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-3">
+                       <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                        Profile Settings
                      </Link>
-                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5 transition-colors">
+                     <button onClick={handleLogout} className="w-full text-left px-5 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-3">
+                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                        Sign out
                      </button>
                   </div>
@@ -144,58 +159,65 @@ const Home = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-40 lg:pt-44 lg:pb-52 overflow-hidden">
+      <section className="relative pt-16 pb-20 lg:pt-20 lg:pb-24 overflow-hidden flex items-center">
         {/* Animated Gradient Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] animate-pulse" />
           <div className="absolute bottom-[-10%] right-[5%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1.5s' }} />
-          <div className="absolute top-[20%] right-[25%] w-[400px] h-[400px] bg-indigo-500/8 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '3s' }} />
           {/* Subtle grid pattern */}
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-transparent to-[#0a0e1a]" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-xs tracking-[0.3em] text-cyan-400 font-semibold uppercase mb-6">THE PREMIER MOTORCYCLE MARKETPLACE</p>
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6">
-            Ride Beyond <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Limits</span>
-          </h1>
-          <p className="mt-4 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            Experience the next evolution of motorcycle performance and community. Join the elite network of Velora riders today.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link to="/marketplace" className="w-full sm:w-auto">
-              <Button variant="primary" className="w-full px-8 py-3.5 text-base rounded-full shadow-[0_0_25px_rgba(6,182,212,0.3)] bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border-0">
-                Explore Marketplace
-              </Button>
-            </Link>
-            <Link to="/community" className="w-full sm:w-auto">
-              <Button variant="secondary" className="w-full px-8 py-3.5 text-base rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all">
-                Join Community
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-          {[
-            { value: '24k+', label: 'ACTIVE RIDERS' },
-            { value: '150+', label: 'EVENTS MONTHLY' },
-            { value: '12M', label: 'MILES LOGGED' },
-            { value: '98%', label: 'SATISFACTION' },
-          ].map((stat, i) => (
-            <div key={i} className="bg-[#0f1629]/90 backdrop-blur-xl border border-white/5 rounded-2xl p-6 text-center shadow-2xl">
-              <div className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 mb-1">
-                {stat.value}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left flex flex-col justify-center animate-slide-in-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-8 mx-auto lg:mx-0 w-fit">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                The Premier Marketplace
               </div>
-              <div className="text-xs tracking-widest text-gray-400 font-semibold uppercase">
-                {stat.label}
+              
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight mb-6 leading-[1.1]">
+                Ride Beyond <br className="hidden lg:block" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Limits</span>
+              </h1>
+              
+              <p className="mt-4 text-lg text-gray-400 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+                Experience the next evolution of motorcycle performance and community. Join the elite network of Velora riders today.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+                <Link to="/marketplace" className="w-full sm:w-auto">
+                  <Button variant="primary" className="w-full px-8 py-3.5 text-base rounded-full shadow-[0_0_25px_rgba(6,182,212,0.3)] bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border-0 group transition-all duration-300 hover:scale-105">
+                    Explore Marketplace
+                    <svg className="w-4 h-4 ml-2 inline-block group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </Button>
+                </Link>
+                <Link to="/community" className="w-full sm:w-auto">
+                  <Button variant="secondary" className="w-full px-8 py-3.5 text-base rounded-full bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 hover:scale-105">
+                    Join Community
+                  </Button>
+                </Link>
               </div>
             </div>
-          ))}
+
+            {/* Right Image */}
+            <div className="relative hidden lg:block animate-slide-in-right h-[600px] w-full">
+              {/* Subtle glowing backplate */}
+              <div className="absolute inset-0 bg-cyan-500/10 blur-[100px] animate-pulse" style={{ animationDuration: '4s' }}></div>
+              
+              {/* Frameless Image */}
+              <div className="absolute right-[-10vw] top-1/2 -translate-y-1/2 w-[140%] h-[120%] transform transition-transform duration-700 hover:scale-[1.02] group pointer-events-none">
+                <img 
+                  src={authBg} 
+                  alt="Velora Rider" 
+                  className="w-full h-full object-cover object-center opacity-85 group-hover:scale-105 transition-transform duration-700"
+                  style={{ WebkitMaskImage: 'radial-gradient(ellipse at right center, black 40%, transparent 80%)' }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

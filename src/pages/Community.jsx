@@ -18,6 +18,7 @@ export default function Community() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [mobileTrendingOpen, setMobileTrendingOpen] = useState(false);
 
   const fetchPostsData = useCallback(async (pageNum = 1, shouldAppend = false) => {
     try {
@@ -186,7 +187,7 @@ export default function Community() {
       <Sidebar variant="events" />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex justify-center py-6 px-4 sm:px-6 lg:px-8 h-screen overflow-y-auto scrollbar-hide">
+      <main className="flex-1 flex justify-center pt-20 pb-6 lg:py-6 px-4 sm:px-6 lg:px-8 h-screen overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-3xl">
           
 
@@ -306,9 +307,33 @@ export default function Community() {
       </main>
 
       {/* Right Sidebar (Trending) - Hidden on mobile/tablet */}
-      <aside className="w80 flex-shrink-0 hidden xl:block border-l border-white/5 p-6 h-screen overflow-y-auto scrollbar-hide">
+      <aside className="w-80 flex-shrink-0 hidden xl:block border-l border-white/5 p-6 h-screen overflow-y-auto scrollbar-hide">
         <TrendingSidebar currentHashtag={hashtagParam} />
       </aside>
+
+      {/* Mobile Trending FAB */}
+      <button 
+        onClick={() => setMobileTrendingOpen(true)}
+        className="xl:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-full flex items-center justify-center text-white shadow-[0_4px_20px_rgba(6,182,212,0.4)] hover:scale-105 transition-transform"
+      >
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" />
+        </svg>
+      </button>
+
+      {/* Mobile Trending Bottom Sheet */}
+      {mobileTrendingOpen && (
+        <div className="xl:hidden fixed inset-0 z-50 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setMobileTrendingOpen(false)}></div>
+          <div className="relative bg-[#0b1120] w-full max-h-[85vh] overflow-y-auto rounded-t-[2.5rem] border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] p-6 pb-10 animate-slide-up">
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-1.5 bg-white/10 rounded-full"></div>
+            </div>
+            <TrendingSidebar currentHashtag={hashtagParam} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
