@@ -127,11 +127,35 @@ export default function Marketplace() {
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 pt-20 pb-10 lg:py-10">
 
           {/* ── Header ── */}
-          <div className="mb-10">
+          <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Velora Marketplace</h1>
             <p className="text-gray-400 text-sm md:text-base max-w-2xl leading-relaxed">
               High-performance machinery, precision-engineered parts, and professional-grade rider equipment.
             </p>
+
+            {/* ── Search Bar ── */}
+            <form
+              onSubmit={(e) => { e.preventDefault(); }}
+              className="mt-5 relative max-w-lg"
+            >
+              <svg className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <input
+                type="text"
+                value={keyword}
+                onChange={(e) => { setKeyword(e.target.value); setPage(1); }}
+                placeholder="Search models, brands, or categories..."
+                className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/30 transition-all"
+              />
+              {keyword && (
+                <button
+                  type="button"
+                  onClick={() => { setKeyword(''); setPage(1); }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              )}
+            </form>
           </div>
 
           {/* ── Loading ── */}

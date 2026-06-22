@@ -77,14 +77,15 @@ export default function Garage() {
 
       <main className="flex-1 overflow-y-auto">
         {/* ══════════ Top Hero Section ══════════ */}
-        <div className="relative w-full h-[180px] md:h-[300px]">
-          <img src={heroImg} alt="Cover" className="absolute inset-0 w-full h-full object-cover opacity-70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e1a] to-transparent opacity-80 md:opacity-100 md:from-[#0a0e1a]/80"></div>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10 pt-4 md:pt-6">
+          <div className="relative w-full h-[180px] md:h-[250px] rounded-2xl md:rounded-[32px] overflow-hidden border border-white/5 shadow-2xl">
+            <img src={user?.coverImage ? (user.coverImage.startsWith('http') ? user.coverImage : `${API_IMG}/uploads/users/${user.coverImage}`) : heroImg} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+          </div>
         </div>
           
         {/* User Profile Info */}
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 -mt-12 md:-mt-20 relative z-10 pb-6 md:pb-8 border-b border-white/5">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#0a0e1a] bg-[#0f1629] overflow-hidden flex-shrink-0 relative">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 relative z-10 pb-6 md:pb-8 border-b border-white/5 pt-2">
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#0a0e1a] bg-[#0f1629] overflow-hidden flex-shrink-0 relative -mt-16 md:-mt-20">
             {user?.profileImage ? (
               <img 
                 src={getUserImg(user)} 

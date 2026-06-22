@@ -29,18 +29,14 @@ export const AuthProvider = ({ children }) => {
   // Restore session on mount
   useEffect(() => {
     const restoreSession = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const data = await authService.getCurrentUser();
+
         setUser(data.data?.user || data.user || data.data || data);
       } catch {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
+        localStorage.removeItem("accessToken");
+
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -76,7 +72,7 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.register(name, email, password);
 
       // accessToken is inside data.data for register
-      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('accessToken', data.accessToken);
 
       const userData = await authService.getCurrentUser();
       setUser(userData.data?.user || userData.user || userData.data || userData);
@@ -89,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // ── Logout ───────────────────────────────────────────────────────
+  // Logout 
   const logout = useCallback(async () => {
     setError(null);
     try {
@@ -98,7 +94,6 @@ export const AuthProvider = ({ children }) => {
       // Even if the server call fails we still clear local state
     } finally {
       localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
       setUser(null);
     }
   }, []);

@@ -19,14 +19,23 @@ export default function Profile() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   
+  const [coverImageFile, setCoverImageFile] = useState(null);
+  const [coverImagePreview, setCoverImagePreview] = useState(null);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const fileInputRef = useRef(null);
+  const coverInputRef = useRef(null);
 
   // Set initial image preview if user already has an avatar
   useEffect(() => {
     if (user?.profileImage) {
-      setImagePreview(`http://localhost:8000/uploads/users/${user.profileImage}`);
+      const pImg = user.profileImage.startsWith('http') ? user.profileImage : `http://localhost:8000/uploads/users/${user.profileImage}`;
+      setImagePreview(pImg);
+    }
+    if (user?.coverImage) {
+      const cImg = user.coverImage.startsWith('http') ? user.coverImage : `http://localhost:8000/uploads/users/${user.coverImage}`;
+      setCoverImagePreview(cImg);
     }
   }, [user]);
 
@@ -39,9 +48,17 @@ export default function Profile() {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      // Create local preview URL
       const objectUrl = URL.createObjectURL(file);
       setImagePreview(objectUrl);
+    }
+  };
+
+  const handleCoverImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCoverImageFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setCoverImagePreview(objectUrl);
     }
   };
 
@@ -63,6 +80,9 @@ export default function Profile() {
     
     if (imageFile) {
       submitData.append('profileImage', imageFile);
+    }
+    if (coverImageFile) {
+      submitData.append('coverImage', coverImageFile);
     }
 
     const result = await updateProfile(submitData);
@@ -111,11 +131,33 @@ export default function Profile() {
           </div>
         )}
 
-        <div className="bg-[#0f1629] border border-white/5 rounded-2xl p-6 sm:p-10 shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="bg-[#0f1629] border border-white/5 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+          {/* Cover Image Section */}
+          <div className="absolute top-0 left-0 w-full h-32 md:h-48 bg-[#1a2540] group cursor-pointer" onClick={() => coverInputRef.current?.click()}>
+            {coverImagePreview ? (
+              <img src={coverImagePreview} alt="Cover Preview" className="w-full h-full object-cover group-hover:opacity-70 transition-opacity" />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 opacity-50 group-hover:opacity-80 transition-opacity bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==')]">
+                <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <span className="text-xs font-bold uppercase tracking-wider">Upload Cover Image</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+            <input 
+              type="file" 
+              ref={coverInputRef} 
+              onChange={handleCoverImageChange} 
+              accept="image/*" 
+              className="hidden" 
+            />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-8 relative z-10 mt-16 md:mt-28">
             
             {/* Avatar Section */}
-            <div className="flex flex-col sm:flex-row items-center gap-6 pb-8 border-b border-white/5">
+            <div className="flex flex-col sm:flex-row items-end gap-6 pb-8 border-b border-white/5">
               <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                 <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-[#1a2540] border-2 border-white/10 flex items-center justify-center">
                   {imagePreview ? (

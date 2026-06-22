@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
+import { getUserPosts } from '../api/communityService';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import img1 from '../assets/img1.png';
@@ -18,6 +19,7 @@ export default function UserProfile() {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [userPosts, setUserPosts] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
@@ -31,12 +33,13 @@ export default function UserProfile() {
 
     const fetchProfileData = async () => {
       try {
-        const [userRes, productsRes, followersRes, followingRes, eventsRes] = await Promise.all([
+        const [userRes, productsRes, followersRes, followingRes, eventsRes, postsRes] = await Promise.all([
           axiosInstance.get(`/users/${id}`),
           axiosInstance.get(`/products?seller=${id}`),
           axiosInstance.get(`/users/${id}/followers`),
           axiosInstance.get(`/users/${id}/following`),
           axiosInstance.get('/ride-events/upcoming'),
+          getUserPosts(id).catch(err => { console.error(err); return { data: { posts: [] } }; })
         ]);
 
         setProfileUser(userRes.data?.data?.user);
@@ -46,6 +49,7 @@ export default function UserProfile() {
         setFollowers(followersList);
         setFollowing(followingRes.data?.data?.following || []);
         setUpcomingEvents(eventsRes.data?.data?.events || []);
+        setUserPosts(postsRes.data?.posts || []);
 
         // Check if current user is already following this user
         if (currentUser) {
@@ -131,14 +135,15 @@ export default function UserProfile() {
 
       <main className="flex-1 overflow-y-auto">
         {/* ══════════ Top Hero / Cover Section ══════════ */}
-        <div className="relative w-full h-[180px] md:h-[300px]">
-          <img src={heroImg} alt="Cover" className="absolute inset-0 w-full h-full object-cover opacity-70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#05080f] to-transparent opacity-80 md:opacity-100 md:from-[#05080f]/80"></div>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10 pt-4 md:pt-6">
+          <div className="relative w-full h-[180px] md:h-[250px] rounded-2xl md:rounded-[32px] overflow-hidden border border-white/5 shadow-2xl">
+            <img src={profileUser.coverImage ? (profileUser.coverImage.startsWith('http') ? profileUser.coverImage : `${API_IMG}/uploads/users/${profileUser.coverImage}`) : heroImg} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+          </div>
         </div>
 
         {/* User Profile Info */}
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 -mt-12 md:-mt-20 relative z-10 pb-6 md:pb-8 border-b border-white/5">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#05080f] bg-[#0f1629] overflow-hidden flex-shrink-0 relative">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 relative z-10 pb-6 md:pb-8 border-b border-white/5 pt-2">
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#05080f] bg-[#0f1629] overflow-hidden flex-shrink-0 relative -mt-16 md:-mt-20">
             {profileUser.profileImage ? (
               <img 
                 src={getUserImg(profileUser)} 
@@ -286,40 +291,60 @@ export default function UserProfile() {
                 )}
               </div>
 
-              {/* Recent Activity */}
+              {/* Community Posts */}
               <div className="bg-[#121622] rounded-2xl p-6 md:p-8 border border-white/5">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-white">Recent Activity</h2>
-                  <div className="flex gap-2">
-                    <button className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center hover:bg-blue-500/20 transition-colors">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                    </button>
-                    <button className="w-8 h-8 rounded-lg border border-white/10 text-gray-400 flex items-center justify-center hover:bg-white/5 transition-colors">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-                    </button>
-                  </div>
+                  <h2 className="text-2xl font-bold text-white">Community Posts</h2>
                 </div>
 
-                {products.length === 0 ? (
+                {userPosts.length === 0 ? (
                   <div className="text-center py-10 border border-dashed border-white/10 rounded-xl">
-                    <p className="text-gray-400 text-sm">No recent activity to show.</p>
+                    <p className="text-gray-400 text-sm">No community posts yet.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {products.slice(0, 5).map((item) => (
-                      <Link key={item._id} to={`/products/${item._id}`} className="relative h-40 rounded-xl overflow-hidden group">
-                        <img src={getImg(item)} alt={item.title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                          <p className="text-xs font-bold text-white truncate">{item.title}</p>
+                  <div className="flex flex-col gap-3">
+                    {userPosts.map((post) => (
+                      <Link key={post._id} to={`/community/post/${post._id}`} className="block p-4 bg-[#1a2035] border border-white/5 hover:border-blue-500/30 rounded-xl transition-all group">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-navy-800">
+                            {post.author?.profileImage ? (
+                              <img src={`http://localhost:8000/uploads/users/${post.author.profileImage}`} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-white bg-blue-600">
+                                {post.author?.name?.charAt(0) || 'U'}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">{post.author?.name}</p>
+                            <p className="text-[10px] text-gray-500">
+                              {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-300 line-clamp-3 mb-3">{post.content}</p>
+                        
+                        {post.images && post.images.length > 0 && (
+                          <div className="flex gap-2 mb-3 overflow-hidden">
+                            {post.images.slice(0, 3).map((img, idx) => (
+                              <div key={idx} className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src={`http://localhost:8000/uploads/posts/${img.url}`} alt="Post img" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            ))}
+                            {post.images.length > 3 && (
+                              <div className="w-20 h-20 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center text-xs font-bold text-gray-400">
+                                +{post.images.length - 3}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-4 mt-2 pt-2 border-t border-white/5 text-xs text-gray-400">
+                          <span className="flex items-center gap-1.5"><svg className="w-4 h-4 text-red-400/70" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg> {post.likesCount || 0}</span>
+                          <span className="flex items-center gap-1.5"><svg className="w-4 h-4 text-blue-400/70" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" /></svg> {post.commentsCount || 0}</span>
                         </div>
                       </Link>
                     ))}
-
-                    {/* Post New placeholder */}
-                    <div className="relative h-40 rounded-xl overflow-hidden bg-[#1a2035] flex flex-col items-center justify-center border border-dashed border-white/10">
-                      <svg className="w-6 h-6 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
-                      <span className="text-[10px] tracking-widest uppercase font-bold text-gray-500">POST NEW</span>
-                    </div>
                   </div>
                 )}
               </div>

@@ -5,6 +5,8 @@ import Dashboard from '../pages/Dashboard';
 import Home from '../pages/Home';
 import Profile from '../pages/Profile';
 import Marketplace from '../pages/Marketplace';
+import Community from '../pages/Community';
+import SinglePost from '../pages/SinglePost';
 import RideEvents from '../pages/RideEvents';
 import RideEventDetails from '../pages/RideEventDetails';
 import CreateRideEvent from '../pages/CreateRideEvent';
@@ -80,6 +82,24 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <Marketplace />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/community"
+        element={
+          <ProtectedRoute>
+            <Community />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/community/post/:id"
+        element={
+          <ProtectedRoute>
+            <SinglePost />
           </ProtectedRoute>
         }
       />

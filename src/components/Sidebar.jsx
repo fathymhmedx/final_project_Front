@@ -24,7 +24,7 @@ const navItems = [
   },
   {
     label: 'Social Feed',
-    path: '#',
+    path: '/community',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
@@ -141,42 +141,29 @@ export default function Sidebar({
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:sticky lg:top-0 lg:z-auto
       `}>
-      {/* Logo + Search */}
+      {/* Logo */}
       <div className="p-5 pb-3">
-        <Link to="/home" className="flex items-center gap-2.5 mb-6">
+        <Link to="/home" className="flex items-center gap-2.5 mb-4">
           <img src={logo} alt="Velora" className="h-7 w-auto" />
         </Link>
-
-        <form onSubmit={handleSearchSubmit} className="relative">
-          <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={searchPlaceholder || 'Search models, brands...'}
-            className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/8 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40 focus:border-blue-500/30 transition-all"
-          />
-        </form>
       </div>
 
-      {/* User Profile Card (shown at top for events variant) */}
-      {!showFilters && (
-        <div className="px-5 pb-3">
-          <div className="flex items-center gap-3 py-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border-2 border-white/10 flex-shrink-0">
-              {user?.profileImage ? (
-                <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                (user?.name?.charAt(0) || 'U').toUpperCase()
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-blue-400 truncate">{user?.name || 'Rider One'}</p>
-              <p className="text-[11px] text-gray-500 truncate">{user?.rank || (user?.role === 'admin' ? 'Administrator' : 'New Rider')}</p>
-            </div>
+      {/* User Profile Card — always shown at top */}
+      <div className="px-5 pb-3">
+        <div className="flex items-center gap-3 py-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border-2 border-white/10 flex-shrink-0">
+            {user?.profileImage ? (
+              <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+              (user?.name?.charAt(0) || 'U').toUpperCase()
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-blue-400 truncate">{user?.name || 'Rider One'}</p>
+            <p className="text-[11px] text-gray-500 truncate">{user?.rank || (user?.role === 'admin' ? 'Administrator' : 'New Rider')}</p>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Navigation */}
       <nav className="px-3 mb-2">
@@ -296,26 +283,7 @@ export default function Sidebar({
 
       {/* Spacer for non-filter variant */}
       {!showFilters && <div className="flex-1"></div>}
-
-      {/* User Profile Section at bottom */}
       <div className="mt-auto border-t border-white/5 p-4">
-        {/* Show user info at bottom for marketplace variant */}
-        {showFilters && (
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border-2 border-white/10 flex-shrink-0">
-              {user?.profileImage ? (
-                <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                (user?.name?.charAt(0) || 'U').toUpperCase()
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">{user?.name || 'Rider'}</p>
-              <p className="text-[11px] text-gray-500 truncate">{user?.rank || (user?.role === 'admin' ? 'Administrator' : 'New Rider')}</p>
-            </div>
-          </div>
-        )}
-
         <Link
           to="/sell-bike"
           className="w-full flex items-center justify-center gap-2 py-2.5 mb-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300"

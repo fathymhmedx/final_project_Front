@@ -7,7 +7,7 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// ── Refresh-token state ──────────────────────────────────────────────
+// Refresh-token state 
 let isRefreshing = false;
 let pendingRequests = [];
 
@@ -22,19 +22,23 @@ const processQueue = (error, token = null) => {
   pendingRequests = [];
 };
 
-// ── Request interceptor ──────────────────────────────────────────────
+// Request interceptor 
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers = {
+        ...config.headers,
+        Authorization:
+          `Bearer ${token}`,
+      };
     }
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// ── Response interceptor ─────────────────────────────────────────────
+// Response interceptor 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -55,7 +59,10 @@ axiosInstance.interceptors.response.use(
       return new Promise((resolve, reject) => {
         pendingRequests.push({ resolve, reject });
       }).then((newToken) => {
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${newToken}`,
+        };
         return axiosInstance(originalRequest);
       });
     }
@@ -68,17 +75,18 @@ axiosInstance.interceptors.response.use(
       const newToken = data.data.accessToken;
 
       localStorage.setItem('accessToken', newToken);
-      axiosInstance.defaults.headers.common.Authorization = `Bearer ${newToken}`;
 
       processQueue(null, newToken);
 
-      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      originalRequest.headers = {
+        ...originalRequest.headers,
+        Authorization: `Bearer ${newToken}`,
+      };
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError, null);
 
       localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
       // Removed: window.location.href = '/login' — causes hard reload
 
       return Promise.reject(refreshError);
