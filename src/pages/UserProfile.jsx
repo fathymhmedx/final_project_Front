@@ -105,7 +105,7 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-[#05080f] text-white">
+      <div className="flex min-h-screen bg-[#0a0e1a] text-white">
         <Sidebar variant="events" />
         <main className="flex-1 flex items-center justify-center">
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -116,7 +116,7 @@ export default function UserProfile() {
 
   if (!profileUser) {
     return (
-      <div className="flex min-h-screen bg-[#05080f] text-white">
+      <div className="flex min-h-screen bg-[#0a0e1a] text-white">
         <Sidebar variant="events" />
         <main className="flex-1 flex flex-col items-center justify-center">
           <svg className="w-16 h-16 text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -130,7 +130,7 @@ export default function UserProfile() {
   const memberSince = new Date(profileUser.createdAt).getFullYear();
 
   return (
-    <div className="flex min-h-screen bg-[#05080f] text-white font-sans selection:bg-blue-500/30">
+    <div className="flex min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
       <Sidebar variant="events" />
 
       <main className="flex-1 overflow-y-auto">
@@ -143,7 +143,7 @@ export default function UserProfile() {
 
         {/* User Profile Info */}
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 relative z-10 pb-6 md:pb-8 border-b border-white/5 pt-2">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#05080f] bg-[#0f1629] overflow-hidden flex-shrink-0 relative -mt-16 md:-mt-20">
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-[#0a0e1a] bg-[#0f1629] overflow-hidden flex-shrink-0 relative -mt-16 md:-mt-20">
             {profileUser.profileImage ? (
               <img 
                 src={getUserImg(profileUser)} 
