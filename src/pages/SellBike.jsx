@@ -85,7 +85,7 @@ export default function SellBike() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#05080f] text-white font-sans selection:bg-blue-500/30">
+    <div className="flex min-h-screen bg-[#0a0e1a] text-white font-sans selection:bg-blue-500/30">
       <Sidebar variant="events" />
 
       <main className="flex-1 overflow-y-auto">

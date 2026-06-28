@@ -28,6 +28,8 @@ export default function RideEvents() {
       
       if (typeFilter === 'my-events') {
         url = '/ride-events/my-events';
+      } else if (typeFilter === 'created-by-me') {
+        url += `&createdBy=${user._id}`;
       } else {
         if (keyword) url += `&keyword=${keyword}`;
         if (typeFilter) url += `&type=${typeFilter}`;
@@ -141,20 +143,35 @@ export default function RideEvents() {
               <p className="text-gray-300 text-sm md:text-base max-w-xl leading-relaxed mb-8 drop-shadow">
                 Connect with the community, explore new routes, and join the elite Velora riders on the open road.
               </p>
-              <div>
-                <Link to="/ride-events/create" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-100 hover:bg-white text-blue-900 font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2">
+                <Link to="/ride-events/create" className="flex justify-center items-center gap-2 px-4 py-2.5 sm:px-6 sm:py-3 bg-blue-100 hover:bg-white text-blue-900 text-sm sm:text-base font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 w-full sm:w-auto whitespace-nowrap">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                   </svg>
                   Create Event
                 </Link>
+                {user && (
+                  <button 
+                    onClick={() => { 
+                      setTypeFilter('created-by-me'); 
+                      setPage(1); 
+                      document.getElementById('events-filter')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="flex justify-center items-center gap-2 px-4 py-2.5 sm:px-6 sm:py-3 bg-[#0f1629]/50 hover:bg-white/10 text-white text-sm sm:text-base font-bold rounded-xl border border-white/20 transition-all backdrop-blur-md shadow-lg w-full sm:w-auto whitespace-nowrap"
+                  >
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    My Ride Events
+                  </button>
+                )}
               </div>
             </div>
           </div>
 
           {/* ══════════ Filter Bar ══════════ */}
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-8">
+          <div id="events-filter" className="flex flex-col md:flex-row gap-4 justify-between items-center mb-8">
             <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
               {['', ...(user ? ['my-events'] : []), 'group', 'meetup', 'social', 'workshop'].map((t) => (
                 <button
@@ -166,7 +183,7 @@ export default function RideEvents() {
                       : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/5'
                   }`}
                 >
-                  {t === '' ? 'All Events' : t === 'my-events' ? 'My Events' : t}
+                  {t === '' ? 'All Events' : t === 'my-events' ? 'Joined Events' : t}
                 </button>
               ))}
             </div>

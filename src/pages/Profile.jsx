@@ -154,10 +154,10 @@ export default function Profile() {
             />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8 relative z-10 mt-16 md:mt-28">
+          <form onSubmit={handleSubmit} className="space-y-8 relative z-10 mt-20 md:mt-36">
             
             {/* Avatar Section */}
-            <div className="flex flex-col sm:flex-row items-end gap-6 pb-8 border-b border-white/5">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 sm:gap-8 pb-8 border-b border-white/5">
               <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                 <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-[#1a2540] border-2 border-white/10 flex items-center justify-center">
                   {imagePreview ? (
@@ -179,14 +179,14 @@ export default function Profile() {
                   className="hidden" 
                 />
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <h3 className="text-lg font-bold text-white mb-1">Profile Photo</h3>
                 <p className="text-sm text-gray-400 mb-4">Upload a high-res image to stand out in the community.</p>
                 <Button 
                   type="button" 
                   variant="secondary" 
                   onClick={() => fileInputRef.current?.click()}
-                  className="py-2 px-4 border border-white/10 text-sm"
+                  className="py-2 px-6 border border-white/10 text-sm font-bold"
                 >
                   Change Photo
                 </Button>

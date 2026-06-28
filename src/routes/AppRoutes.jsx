@@ -61,11 +61,7 @@ export default function AppRoutes() {
       {/* Protected Routes */}
       <Route
         path="/home"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
+        element={<Home />}
       />
       
       <Route
@@ -207,11 +203,11 @@ export default function AppRoutes() {
       {/* 403 Forbidden */}
       <Route path="/403" element={<Forbidden />} />
 
-      {/* Redirect root to login */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Redirect root to home */}
+      <Route path="/" element={<Navigate to="/home" replace />} />
 
       {/* Catch-all redirect */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 }

@@ -121,38 +121,55 @@ const Home = () => {
 
             {/* Right Icons */}
             <div className="flex items-center gap-4 text-gray-400">
-              <button className="relative p-2.5 rounded-full hover:bg-white/5 hover:text-white transition-all duration-300 group">
-                <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                {/* Notification Dot */}
-                <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.8)] border-2 border-[#0a0e1a]"></span>
-              </button>
-              
-              <div className="relative group cursor-pointer pl-1">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border-2 border-transparent group-hover:border-cyan-400 shadow-lg transition-all duration-300">
-                  {user?.profileImage ? (
-                    <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  ) : (
-                    (user?.name?.charAt(0) || 'U').toUpperCase()
-                  )}
-                </div>
-                {/* Enhanced Dropdown */}
-                <div className="absolute right-0 top-[120%] pt-2 w-56 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                  <div className="bg-[#0a0e1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl py-2 overflow-hidden">
-                     <div className="px-5 py-3 border-b border-white/5 mb-1 bg-white/[0.02]">
-                       <p className="text-sm font-bold text-white truncate">{user?.name}</p>
-                       <p className="text-xs text-cyan-400 truncate mt-0.5">{user?.email}</p>
-                     </div>
-                     <Link to="/profile" className="block w-full text-left px-5 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-3">
-                       <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                       Profile Settings
-                     </Link>
-                     <button onClick={handleLogout} className="w-full text-left px-5 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-3">
-                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                       Sign out
-                     </button>
+              {user ? (
+                <>
+                  <button className="relative p-2.5 rounded-full hover:bg-white/5 hover:text-white transition-all duration-300 group">
+                    <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    {/* Notification Dot */}
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.8)] border-2 border-[#0a0e1a]"></span>
+                  </button>
+                  
+                  <div className="relative group cursor-pointer pl-1">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border-2 border-transparent group-hover:border-cyan-400 shadow-lg transition-all duration-300">
+                      {user.profileImage ? (
+                        <img src={`http://localhost:8000/uploads/users/${user.profileImage}`} alt={user.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      ) : (
+                        (user.name?.charAt(0) || 'U').toUpperCase()
+                      )}
+                    </div>
+                    {/* Enhanced Dropdown */}
+                    <div className="absolute right-0 top-full pt-4 w-56 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                      <div className="bg-[#0a0e1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl py-2 overflow-hidden">
+                         <div className="px-5 py-3 border-b border-white/5 mb-1 bg-white/[0.02]">
+                           <p className="text-sm font-bold text-white truncate">{user.name}</p>
+                           <p className="text-xs text-cyan-400 truncate mt-0.5">{user.email}</p>
+                         </div>
+                         <Link to="/profile" className="block w-full text-left px-5 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-3">
+                           <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                           Profile Settings
+                         </Link>
+                         <button onClick={handleLogout} className="w-full text-left px-5 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-3">
+                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                           Sign out
+                         </button>
+                      </div>
+                    </div>
                   </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-3 md:gap-4">
+                  <Link to="/login">
+                    <button className="px-5 py-2 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300">
+                      Log In
+                    </button>
+                  </Link>
+                  <Link to="/register">
+                    <button className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
+                      Sign Up
+                    </button>
+                  </Link>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
