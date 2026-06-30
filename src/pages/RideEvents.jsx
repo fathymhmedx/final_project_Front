@@ -20,6 +20,7 @@ export default function RideEvents() {
   
   const [keyword, setKeyword] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [actionError, setActionError] = useState('');
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -102,7 +103,8 @@ export default function RideEvents() {
       setUpcomingEvents(prev => updateList(prev));
     } catch (err) {
       console.error('Error toggling participation:', err);
-      alert(err.response?.data?.message || 'Action failed');
+      setActionError(err.response?.data?.message || 'Action failed');
+      setTimeout(() => setActionError(''), 5000);
     }
   };
 
@@ -125,6 +127,15 @@ export default function RideEvents() {
 
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 pt-20 pb-10 lg:py-10">
+          {/* Action Error Toast */}
+          {actionError && (
+            <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+              <svg className="w-4 h-4 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-xs text-red-400">{actionError}</p>
+            </div>
+          )}
 
           {/* ══════════ Hero Section ══════════ */}
           <div className="relative w-full h-[320px] rounded-3xl overflow-hidden mb-8 border border-white/10 shadow-2xl">

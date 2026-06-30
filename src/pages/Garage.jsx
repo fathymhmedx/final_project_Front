@@ -16,6 +16,7 @@ export default function Garage() {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     const fetchGarageData = async () => {
@@ -48,7 +49,8 @@ export default function Garage() {
       setProductToDelete(null);
     } catch (err) {
       console.error('Error deleting product:', err);
-      alert('Failed to delete the product.');
+      setDeleteError(err?.response?.data?.message || 'Failed to delete the product.');
+      setTimeout(() => setDeleteError(''), 5000);
       setProductToDelete(null);
     }
   };
@@ -82,6 +84,18 @@ export default function Garage() {
             <img src={user?.coverImage ? (user.coverImage.startsWith('http') ? user.coverImage : `${API_IMG}/uploads/users/${user.coverImage}`) : heroImg} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         </div>
+
+        {/* Delete Error Toast */}
+        {deleteError && (
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10 mt-4">
+            <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+              <svg className="w-4 h-4 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-xs text-red-400">{deleteError}</p>
+            </div>
+          </div>
+        )}
           
         {/* User Profile Info */}
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center text-center md:text-left md:items-end gap-4 md:gap-6 relative z-10 pb-6 md:pb-8 border-b border-white/5 pt-2">

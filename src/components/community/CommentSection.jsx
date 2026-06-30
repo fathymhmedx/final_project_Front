@@ -20,7 +20,7 @@ function CommentItem({ comment, postId, onReplyAdded, onDelete }) {
   );
   const [likesCount, setLikesCount] = useState(comment.likesCount || 0);
 
-  const isAuthor = user && comment.author._id === user._id;
+  const isAuthor = user && comment.author && comment.author._id === user._id;
 
   const fetchReplies = useCallback(async () => {
     try {
@@ -86,12 +86,16 @@ function CommentItem({ comment, postId, onReplyAdded, onDelete }) {
     <div className="group mb-4">
       <div className="flex gap-3">
         {/* Avatar */}
-        <Link to={`/users/${comment.author._id}`} className="flex-shrink-0 mt-1">
+        <Link 
+          to={`/users/${comment.author?._id || ''}`} 
+          onClick={(e) => !comment.author && e.preventDefault()}
+          className={`flex-shrink-0 mt-1 ${!comment.author ? 'cursor-default' : ''}`}
+        >
           <div className="w-8 h-8 rounded-full overflow-hidden bg-navy-800 flex items-center justify-center text-[10px] font-bold">
-            {comment.author.profileImage ? (
-              <img src={`http://localhost:8000/uploads/users/${comment.author.profileImage}`} alt={comment.author.name} className="w-full h-full object-cover" />
+            {comment.author?.profileImage ? (
+              <img src={`http://localhost:8000/uploads/users/${comment.author.profileImage}`} alt={comment.author?.name || 'Unknown'} className="w-full h-full object-cover" />
             ) : (
-              (comment.author.name?.charAt(0) || 'U').toUpperCase()
+              (comment.author?.name?.charAt(0) || 'U').toUpperCase()
             )}
           </div>
         </Link>
@@ -99,8 +103,12 @@ function CommentItem({ comment, postId, onReplyAdded, onDelete }) {
         {/* Content Box */}
         <div className="flex-1 min-w-0">
           <div className="bg-white/5 rounded-2xl rounded-tl-none px-4 py-2 inline-block max-w-full">
-            <Link to={`/users/${comment.author._id}`} className="text-xs font-semibold hover:text-blue-400 transition-colors mr-2">
-              {comment.author.name}
+            <Link 
+              to={`/users/${comment.author?._id || ''}`} 
+              onClick={(e) => !comment.author && e.preventDefault()}
+              className={`text-xs font-semibold mr-2 ${comment.author ? 'hover:text-blue-400 transition-colors' : 'cursor-default'}`}
+            >
+              {comment.author?.name || 'Unknown Rider'}
             </Link>
             <span className="text-[10px] text-gray-500">{timeAgo(comment.createdAt)}</span>
             {isEditing ? (

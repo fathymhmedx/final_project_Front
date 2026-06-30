@@ -91,15 +91,15 @@ export default function TrendingSidebar({ currentHashtag }) {
                 <div key={post._id} className="p-2 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer" onClick={() => navigate(`/community/post/${post._id}`)}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <div className="w-5 h-5 rounded-full overflow-hidden bg-navy-800">
-                      {post.author.profileImage ? (
+                      {post.author?.profileImage ? (
                         <img src={`http://localhost:8000/uploads/users/${post.author.profileImage}`} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-white bg-blue-600">
-                          {post.author.name?.charAt(0)}
+                          {post.author?.name?.charAt(0) || 'U'}
                         </div>
                       )}
                     </div>
-                    <span className="text-[11px] font-medium text-gray-300 group-hover:text-blue-400 transition-colors truncate">{post.author.name}</span>
+                    <span className="text-xs font-medium text-gray-300 group-hover:text-blue-400 transition-colors">{post.author?.name || 'Unknown'}</span>
                   </div>
                   <p className="text-xs text-gray-400 line-clamp-2">{post.content}</p>
                   <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-500">

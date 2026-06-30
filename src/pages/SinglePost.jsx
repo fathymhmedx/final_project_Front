@@ -12,6 +12,7 @@ export default function SinglePost() {
   const { user } = useAuth();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -75,7 +76,8 @@ export default function SinglePost() {
       setPost(prev => ({ ...prev, content: newContent }));
     } catch (err) {
       console.error('Error updating post:', err);
-      alert('Failed to update post.');
+      setActionError(err.response?.data?.message || 'Failed to update post.');
+      setTimeout(() => setActionError(''), 5000);
     }
   };
 
@@ -88,7 +90,16 @@ export default function SinglePost() {
       <Sidebar variant="events" />
 
       <main className="flex-1 flex justify-center py-6 px-4 sm:px-6 lg:px-8 h-screen overflow-y-auto scrollbar-hide">
-        <div className="w-full max-w-3xl">
+        <div className="w-full max-w-2xl mt-12 mb-20 md:mb-0">
+          {actionError && (
+            <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+              <svg className="w-4 h-4 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-xs text-red-400">{actionError}</p>
+            </div>
+          )}
+
           <div className="flex items-center gap-4 mb-6">
             <button 
               onClick={() => navigate(-1)}

@@ -119,7 +119,7 @@ export default function PostCard({
   const [editContent, setEditContent] = useState(post.content || '');
   const [lightboxIndex, setLightboxIndex] = useState(null); // null = closed
   
-  const isAuthor = user && post.author._id === user._id;
+  const isAuthor = user && post.author && post.author._id === user._id;
   const isLiked = user && post.likes.some(like => {
     return typeof like === 'object' ? like._id === user._id : like === user._id;
   });
@@ -188,30 +188,38 @@ export default function PostCard({
         {/* Header */}
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3 group">
-            <Link to={`/users/${post.author._id}`} className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-400 p-[2px]">
+            <Link 
+              to={`/users/${post.author?._id || ''}`} 
+              onClick={(e) => !post.author && e.preventDefault()}
+              className={`w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-400 p-[2px] ${!post.author ? 'cursor-default' : ''}`}
+            >
               <div className="w-full h-full rounded-full overflow-hidden bg-navy-950 flex items-center justify-center text-xs font-bold">
-                {post.author.profileImage ? (
+                {post.author?.profileImage ? (
                   <img 
                     src={`http://localhost:8000/uploads/users/${post.author.profileImage}`} 
-                    alt={post.author.name} 
+                    alt={post.author?.name || 'Unknown'} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
                   />
                 ) : (
-                  (post.author.name?.charAt(0) || 'U').toUpperCase()
+                  (post.author?.name?.charAt(0) || 'U').toUpperCase()
                 )}
               </div>
             </Link>
             <div>
-              <Link to={`/users/${post.author._id}`} className="text-sm font-semibold text-white hover:text-blue-400 transition-colors flex items-center gap-1.5">
-                {post.author.name}
-                {post.author.isVerified && (
+              <Link 
+                to={`/users/${post.author?._id || ''}`} 
+                onClick={(e) => !post.author && e.preventDefault()}
+                className={`font-semibold text-white flex items-center gap-1.5 ${post.author ? 'hover:text-blue-400 transition-colors' : 'cursor-default'}`}
+              >
+                {post.author?.name || 'Unknown Rider'}
+                {post.author?.isVerified && (
                   <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
                     <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
                   </svg>
                 )}
               </Link>
-              <p className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
-                <span>{post.author.rank || 'Rider'}</span>
+              <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-2">
+                <span>{post.author?.rank || 'Rider'}</span>
                 <span>•</span>
                 <span>{formatDate(post.createdAt)}</span>
               </p>

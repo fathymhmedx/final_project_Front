@@ -16,6 +16,7 @@ export default function RideEventDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [actionError, setActionError] = useState('');
 
   const fetchEvent = async () => {
     try {
@@ -46,7 +47,8 @@ export default function RideEventDetails() {
       fetchEvent();
     } catch (err) {
       console.error('Error toggling participation:', err);
-      alert(err.response?.data?.message || 'Action failed');
+      setActionError(err.response?.data?.message || 'Action failed. Please try again.');
+      setTimeout(() => setActionError(''), 5000);
     }
   };
 
@@ -56,7 +58,8 @@ export default function RideEventDetails() {
       navigate('/ride-events');
     } catch (err) {
       console.error('Error deleting event:', err);
-      alert(err.response?.data?.message || 'Failed to delete event');
+      setActionError(err.response?.data?.message || 'Failed to delete event.');
+      setTimeout(() => setActionError(''), 5000);
       setShowDeleteModal(false);
     }
   };
@@ -241,7 +244,11 @@ export default function RideEventDetails() {
               <div className="bg-[#0b1120] border border-white/5 p-6 rounded-3xl">
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Organizer</h3>
                 <div className="flex items-center gap-4">
-                  <Link to={`/users/${event.createdBy?._id}`} className="w-12 h-12 rounded-full overflow-hidden bg-gray-800 border-2 border-[#0f1629] flex-shrink-0">
+                  <Link 
+                    to={`/users/${event.createdBy?._id || ''}`} 
+                    onClick={(e) => !event.createdBy && e.preventDefault()}
+                    className={`w-12 h-12 rounded-full overflow-hidden bg-gray-800 border-2 border-[#0f1629] flex-shrink-0 ${!event.createdBy ? 'cursor-default' : ''}`}
+                  >
                     {event.createdBy?.profileImage ? (
                       <img src={`${API_IMG}/uploads/users/${event.createdBy.profileImage}`} alt={event.createdBy.name} className="w-full h-full object-cover" />
                     ) : (
@@ -251,8 +258,12 @@ export default function RideEventDetails() {
                     )}
                   </Link>
                   <div>
-                    <Link to={`/users/${event.createdBy?._id}`} className="text-sm font-bold text-white hover:text-blue-400 transition-colors block">
-                      {event.createdBy?.name}
+                    <Link 
+                      to={`/users/${event.createdBy?._id || ''}`} 
+                      onClick={(e) => !event.createdBy && e.preventDefault()}
+                      className={`text-sm font-bold text-white block ${event.createdBy ? 'hover:text-blue-400 transition-colors' : 'cursor-default'}`}
+                    >
+                      {event.createdBy?.name || 'Unknown Rider'}
                     </Link>
                     <p className="text-xs text-gray-400">{event.createdBy?.rank || 'Rider'}</p>
                   </div>
